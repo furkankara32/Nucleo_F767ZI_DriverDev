@@ -1,0 +1,54 @@
+#include "examples.h"
+#include "examples_config.h"
+
+int main(void)
+{
+#if ACTIVE_EXAMPLE == EXAMPLE_GPIO_LED_BLINK
+
+	EX001_GPIO_LedBlink();
+
+#elif ACTIVE_EXAMPLE == EXAMPLE_GPIO_LED_SET_RESET
+
+	EX002_GPIO_LedSetReset();
+
+#elif ACTIVE_EXAMPLE == EXAMPLE_GPIO_BUTTON_INPUT
+
+	EX003_GPIO_ButtonInput();
+
+#elif ACTIVE_EXAMPLE == EXAMPLE_GPIO_DEINIT_TEST
+	EX004_GPIO_DeInitTest();
+
+#elif ACTIVE_EXAMPLE == EXAMPLE_GPIO_BUTTON_INTERRUPT
+
+	EX005_GPIO_ButtonInterrupt();
+#elif ACTIVE_EXAMPLE == EXAMPLE_SYSTICK_LED_BLINK
+
+	EX006_SysTickLedBlink();
+
+#elif ACTIVE_EXAMPLE == EXAMPLE_USART3_TX
+
+	EX007_USART3_Tx();
+
+#elif ACTIVE_EXAMPLE == EXAMPLE_USART3_RX_ECHO
+
+	EX008_USART3_RxEcho();
+
+#elif ACTIVE_EXAMPLE == EXAMPLE_USART3_IT_RX_ECHO
+
+	EX009_USART3_InterruptRxEcho();
+#elif ACTIVE_EXAMPLE == EXAMPLE_USART3_PACKET_10BYTE
+
+	EX010_USART3_Packet10Byte();
+#elif ACTIVE_EXAMPLE == EXAMPLE_USART3_PACKET_PARSER
+
+	EX011_USART3_PacketParser();
+#else
+
+	while (1);
+
+#endif
+
+	while (1)
+	{
+	}
+}

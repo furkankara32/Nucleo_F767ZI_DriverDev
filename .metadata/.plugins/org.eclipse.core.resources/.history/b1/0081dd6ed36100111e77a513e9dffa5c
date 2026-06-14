@@ -1,0 +1,93 @@
+/*
+ * ex011_usart3_packet_parser.c
+ *
+ *  Created on: Jun 6, 2026
+ *      Author: furkan
+ */
+
+#include "stm32f767xx_gpio_driver.h"
+#include "stm32f767xx_usart_driver.h"
+#include "stm32f767xx_systick_driver.h"
+#include "stm32f767xx_nvic_driver.h"
+#include "examples_config.h"
+
+#if ACTIVE_EXAMPLE == EXAMPLE_USART3_PACKET_PARSER
+
+#define PACKET_START_BYTE       0xAAU
+#define PACKET_MAX_PAYLOAD      32U
+
+#define PACKET_STATUS_NONE              0U
+#define PACKET_STATUS_OK                1U
+#define PACKET_STATUS_CHECKSUM_ERROR    2U
+#define PACKET_STATUS_LENGTH_ERROR      3U
+
+typedef enum
+{
+	PARSER_WAIT_START = 0,
+	PARSER_READ_LENGTH,
+	PARSER_READ_MSG_ID,
+	PARSER_READ_PAYLOAD,
+	PARSER_READ_CHECKSUM
+}PacketParserState_t;
+
+typedef struct
+{
+	uint8_t msg_id;
+	uint8_t length;
+	uint8_t payload[PACKET_MAX_PAYLOAD]
+}DronePacket_t;
+
+typedef struct
+{
+	PacketParserState_t state;
+
+	uint8_t length;
+	uint8_t msg_id;
+	uint8_t payload[PACKET_MAX_PAYLOAD];
+	uint8_t payload_index;
+	uint8_t checksum;
+}PacketParser_t;
+
+static USART_Handle_t USART3Handle;
+static uint8_t USART3_RxRingBuffer[128];
+
+static volatile uint32_t g_usart3_rx_overflow_count = 0;
+static volatile uint32_t g_usart3_error_count = 0;
+static volatile uint32_t g_packet_ok_count = 0;
+static volatile uint32_t g_packet_checksum_error_count = 0;
+static volatile uint32_t g_packet_length_error_count = 0;
+
+static void USART3_SendString(const char *str)
+{
+	uint32_t len = 0U;
+
+	while(str[len] != "\0")
+	{
+		len++;
+	}
+	USART_SendDataWithTimeout(&USART3Handle, (uint8_t*)str, len, 100U);
+
+}
+
+static USART3_SendHexNibble(uint8_t value)
+{
+	uint8_t ch;
+
+	value &= 0x0FU;
+
+	if(value < 10U)
+	{
+		ch = '0' + value;
+	}
+	else
+	{
+		ch = 'A' + (value - 10U);
+	}
+
+	USART_SendDataWithTimeout(&USART3Handle, &ch, 1U, 100U);
+}
+static void USART3_SendHex8(uint8_t value)
+{
+	USART3_SendHexNibble(value >> 4U);
+	USART3_SendHexNibble(value);
+}

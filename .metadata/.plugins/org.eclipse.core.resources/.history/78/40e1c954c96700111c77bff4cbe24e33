@@ -1,0 +1,843 @@
+/*
+ * stm32f767xx_i2c_driver.c
+ *
+ *  Created on: Jun 12, 2026
+ *      Author: furkan
+ */
+
+#include "stm32f767xx_i2c_driver.h"
+#include "stm32f767xx_systick_driver.h"
+
+static uint8_t I2C_WaitOnFlagUntilTimeout(I2C_RegDef_t *pI2Cx,uint32_t FlagName,uint8_t DesiredStatus,uint32_t TimeoutMs,uint8_t TimeoutStatus)
+{
+    uint32_t start_tick = millis();
+    uint8_t error_status;
+
+    while (I2C_GetFlagStatus(pI2Cx, FlagName) != DesiredStatus)
+    {
+        /*
+         * NACK received.
+         * This usually means there is no slave device at this address,
+         * or the slave rejected the transfer.
+         */
+        if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_NACKF) == SET)
+        {
+            I2C_ClearNACKFlag(pI2Cx);
+
+            if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+            {
+                I2C_ClearSTOPFlag(pI2Cx);
+            }
+
+            return I2C_STATUS_NACK;
+        }
+
+        /*
+         * Check real bus errors.
+         */
+        error_status = I2C_GetErrorStatus(pI2Cx);
+
+        if (error_status & (I2C_ERROR_BERR |
+                            I2C_ERROR_ARLO |
+                            I2C_ERROR_OVR  |
+                            I2C_ERROR_TIMEOUT))
+        {
+            I2C_ClearErrorFlags(pI2Cx);
+
+            if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+            {
+                I2C_ClearSTOPFlag(pI2Cx);
+            }
+
+            return I2C_STATUS_ERROR;
+        }
+
+        if ((millis() - start_tick) >= TimeoutMs)
+        {
+            return TimeoutStatus;
+        }
+    }
+
+    return I2C_STATUS_OK;
+}
+static uint8_t I2C_ConfigMasterTransfer(I2C_RegDef_t *pI2Cx,I2C_TransferConfig_t *pTransfer)
+{
+    uint32_t cr2;
+
+    if ((pI2Cx == 0) || (pTransfer == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if (pTransfer->NumBytes > 255U)
+    {
+        /*
+         * First version:
+         * NBYTES <= 255.
+         * Larger transfers will be handled later.
+         */
+        return I2C_STATUS_ERROR;
+    }
+
+    cr2 = pI2Cx->I2C_CR2;
+
+    /*
+     * Clear transfer-related fields.
+     */
+    cr2 &= ~(0x3FFU << I2C_CR2_SADD);
+    cr2 &= ~(1U << I2C_CR2_RD_WRN);
+    cr2 &= ~(1U << I2C_CR2_ADD10);
+    cr2 &= ~(1U << I2C_CR2_HEAD10R);
+    cr2 &= ~(0xFFU << I2C_CR2_NBYTES);
+    cr2 &= ~(1U << I2C_CR2_RELOAD);
+    cr2 &= ~(1U << I2C_CR2_AUTOEND);
+
+    /*
+     * Address mode.
+     */
+    if (pTransfer->AddressMode == I2C_ADDR_MODE_7BIT)
+    {
+        if (pTransfer->SlaveAddress > 0x7FU)
+        {
+            return I2C_STATUS_ERROR;
+        }
+
+        /*
+         * In 7-bit mode:
+         * SADD[7:1] contains the 7-bit slave address.
+         * User gives unshifted address, example 0x68.
+         */
+        cr2 |= (((uint32_t)pTransfer->SlaveAddress & 0x7FU) << 1U);
+    }
+    else if (pTransfer->AddressMode == I2C_ADDR_MODE_10BIT)
+    {
+        if (pTransfer->SlaveAddress > 0x3FFU)
+        {
+            return I2C_STATUS_ERROR;
+        }
+
+        cr2 |= ((uint32_t)pTransfer->SlaveAddress & 0x3FFU);
+        cr2 |= (1U << I2C_CR2_ADD10);
+
+        if (pTransfer->Head10R == I2C_HEAD10R_HEADER_ONLY)
+        {
+            cr2 |= (1U << I2C_CR2_HEAD10R);
+        }
+    }
+    else
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    /*
+     * Direction.
+     */
+    if (pTransfer->Direction == I2C_TRANSFER_READ)
+    {
+        cr2 |= (1U << I2C_CR2_RD_WRN);
+    }
+    else if (pTransfer->Direction == I2C_TRANSFER_WRITE)
+    {
+        cr2 &= ~(1U << I2C_CR2_RD_WRN);
+    }
+    else
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    /*
+     * Number of bytes.
+     */
+    cr2 |= ((uint32_t)pTransfer->NumBytes << I2C_CR2_NBYTES);
+
+    /*
+     * Reload.
+     */
+    if (pTransfer->Reload == I2C_RELOAD_ENABLE)
+    {
+        cr2 |= (1U << I2C_CR2_RELOAD);
+    }
+
+    /*
+     * Autoend.
+     */
+    if (pTransfer->AutoEnd == I2C_AUTOEND_ENABLE)
+    {
+        cr2 |= (1U << I2C_CR2_AUTOEND);
+    }
+
+    pI2Cx->I2C_CR2 = cr2;
+
+    return I2C_STATUS_OK;
+}
+void I2C_PeriClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
+{
+    if (EnorDi == ENABLE)
+    {
+        if (pI2Cx == I2C1)
+        {
+            I2C1_PCLK_EN();
+        }
+        else if (pI2Cx == I2C2)
+        {
+            I2C2_PCLK_EN();
+        }
+        else if (pI2Cx == I2C3)
+        {
+            I2C3_PCLK_EN();
+        }
+        else if (pI2Cx == I2C4)
+        {
+            I2C4_PCLK_EN();
+        }
+    }
+    else
+    {
+        if (pI2Cx == I2C1)
+        {
+            I2C1_PCLK_DI();
+        }
+        else if (pI2Cx == I2C2)
+        {
+            I2C2_PCLK_DI();
+        }
+        else if (pI2Cx == I2C3)
+        {
+            I2C3_PCLK_DI();
+        }
+        else if (pI2Cx == I2C4)
+        {
+            I2C4_PCLK_DI();
+        }
+    }
+}
+
+
+uint8_t I2C_Init(I2C_Handle_t *pI2CHandle)
+{
+    uint32_t tempreg = 0U;
+
+    if ((pI2CHandle == 0) || (pI2CHandle->pI2Cx == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if (pI2CHandle->I2C_Config.I2C_Timing == 0U)
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if (pI2CHandle->I2C_Config.I2C_DigitalFilter > 15U)
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    /*
+     * 1. Enable peripheral clock.
+     */
+    I2C_PeriClockControl(pI2CHandle->pI2Cx, ENABLE);
+
+    /*
+     * 2. Disable I2C before configuration.
+     * TIMINGR and filter settings must be configured while PE = 0.
+     */
+    I2C_PeripheralControl(pI2CHandle->pI2Cx, DISABLE);
+
+    /*
+     * 3. Clear CR1 configuration area.
+     */
+    tempreg = 0U;
+
+    /*
+     * Analog filter.
+     * ANFOFF = 0 -> enabled
+     * ANFOFF = 1 -> disabled
+     */
+    if (pI2CHandle->I2C_Config.I2C_AnalogFilter == I2C_ANALOG_FILTER_DISABLE)
+    {
+        tempreg |= (1U << I2C_CR1_ANFOFF);
+    }
+
+    /*
+     * Digital filter.
+     * DNF[3:0] is CR1[11:8].
+     */
+    tempreg |= ((uint32_t)(pI2CHandle->I2C_Config.I2C_DigitalFilter & 0x0FU) << I2C_CR1_DNF);
+
+    /*
+     * Clock stretching.
+     * NOSTRETCH = 0 -> enabled
+     * NOSTRETCH = 1 -> disabled
+     */
+    if (pI2CHandle->I2C_Config.I2C_ClockStretch == I2C_CLOCK_STRETCH_DISABLE)
+    {
+        tempreg |= (1U << I2C_CR1_NOSTRETCH);
+    }
+
+    /*
+     * Write CR1 while PE = 0.
+     */
+    pI2CHandle->pI2Cx->I2C_CR1 = tempreg;
+
+    /*
+     * 4. Configure timing.
+     */
+    pI2CHandle->pI2Cx->I2C_TIMINGR = pI2CHandle->I2C_Config.I2C_Timing;
+
+    /*
+     * 5. Clear possible pending flags.
+     */
+    I2C_ClearErrorFlags(pI2CHandle->pI2Cx);
+    I2C_ClearSTOPFlag(pI2CHandle->pI2Cx);
+    I2C_ClearNACKFlag(pI2CHandle->pI2Cx);
+
+    /*
+     * 6. Enable peripheral.
+     */
+    I2C_PeripheralControl(pI2CHandle->pI2Cx, ENABLE);
+
+    return I2C_STATUS_OK;
+}
+
+
+void I2C_DeInit(I2C_RegDef_t *pI2Cx)
+{
+    if (pI2Cx == I2C1)
+    {
+        I2C1_REG_RESET();
+    }
+    else if (pI2Cx == I2C2)
+    {
+        I2C2_REG_RESET();
+    }
+    else if (pI2Cx == I2C3)
+    {
+        I2C3_REG_RESET();
+    }
+    else if (pI2Cx == I2C4)
+    {
+        I2C4_REG_RESET();
+    }
+}
+
+
+void I2C_PeripheralControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
+{
+    if (EnorDi == ENABLE)
+    {
+        pI2Cx->I2C_CR1 |= (1U << I2C_CR1_PE);
+    }
+    else
+    {
+        pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_PE);
+    }
+}
+
+
+uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t FlagName)
+{
+    if (pI2Cx->I2C_ISR & FlagName)
+    {
+        return SET;
+    }
+
+    return RESET;
+}
+
+
+uint8_t I2C_GetErrorStatus(I2C_RegDef_t *pI2Cx)
+{
+    uint8_t error_status = I2C_ERROR_NONE;
+
+    if (pI2Cx == 0)
+    {
+        return I2C_ERROR_NONE;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_BERR)
+    {
+        error_status |= I2C_ERROR_BERR;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_ARLO)
+    {
+        error_status |= I2C_ERROR_ARLO;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_OVR)
+    {
+        error_status |= I2C_ERROR_OVR;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_TIMEOUT)
+    {
+        error_status |= I2C_ERROR_TIMEOUT;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_NACKF)
+    {
+        error_status |= I2C_ERROR_NACK;
+    }
+
+    return error_status;
+}
+
+
+void I2C_ClearErrorFlags(I2C_RegDef_t *pI2Cx)
+{
+    if (pI2Cx == 0)
+    {
+        return;
+    }
+
+    /*
+     * ICR register clears flags by writing 1 to corresponding clear bits.
+     */
+    pI2Cx->I2C_ICR = ((1U << I2C_ICR_BERRCF)   |
+                      (1U << I2C_ICR_ARLOCF)   |
+                      (1U << I2C_ICR_OVRCF)    |
+                      (1U << I2C_ICR_TIMOUTCF));
+}
+
+
+void I2C_ClearSTOPFlag(I2C_RegDef_t *pI2Cx)
+{
+    if (pI2Cx == 0)
+    {
+        return;
+    }
+
+    pI2Cx->I2C_ICR = (1U << I2C_ICR_STOPCF);
+}
+
+
+void I2C_ClearNACKFlag(I2C_RegDef_t *pI2Cx)
+{
+    if (pI2Cx == 0)
+    {
+        return;
+    }
+
+    pI2Cx->I2C_ICR = (1U << I2C_ICR_NACKCF);
+}
+uint8_t I2C_IsDeviceReadyWithTimeout(I2C_Handle_t *pI2CHandle,uint16_t SlaveAddr,uint8_t AddressMode,uint32_t TimeoutMs)
+{
+    uint8_t status;
+    uint8_t error_status;
+    uint32_t start_tick;
+    I2C_RegDef_t *pI2Cx;
+    I2C_TransferConfig_t transfer;
+
+    if (pI2CHandle == 0)
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2Cx = pI2CHandle->pI2Cx;
+
+    status = I2C_WaitOnFlagUntilTimeout(pI2Cx,I2C_FLAG_BUSY,RESET,TimeoutMs,I2C_STATUS_BUSY_TIMEOUT);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    transfer.SlaveAddress = SlaveAddr;
+    transfer.AddressMode = AddressMode;
+    transfer.Direction = I2C_TRANSFER_WRITE;
+    transfer.AutoEnd = I2C_AUTOEND_ENABLE;
+    transfer.Reload = I2C_RELOAD_DISABLE;
+    transfer.Head10R = I2C_HEAD10R_COMPLETE_SEQ;
+    transfer.NumBytes = 0U;
+    transfer.TimeoutMs = TimeoutMs;
+
+    status = I2C_ConfigMasterTransfer(pI2Cx, &transfer);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    pI2Cx->I2C_CR2 |= (1U << I2C_CR2_START);
+
+    start_tick = millis();
+
+    while (1)
+    {
+        if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_NACKF) == SET)
+        {
+            I2C_ClearNACKFlag(pI2Cx);
+
+            if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+            {
+                I2C_ClearSTOPFlag(pI2Cx);
+            }
+
+            return I2C_STATUS_NACK;
+        }
+
+        if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+        {
+            I2C_ClearSTOPFlag(pI2Cx);
+            return I2C_STATUS_OK;
+        }
+
+        error_status = I2C_GetErrorStatus(pI2Cx);
+
+        if (error_status & (I2C_ERROR_BERR |
+                            I2C_ERROR_ARLO |
+                            I2C_ERROR_OVR  |
+                            I2C_ERROR_TIMEOUT))
+        {
+            I2C_ClearErrorFlags(pI2Cx);
+
+            if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+            {
+                I2C_ClearSTOPFlag(pI2Cx);
+            }
+
+            return I2C_STATUS_ERROR;
+        }
+
+        if ((millis() - start_tick) >= TimeoutMs)
+        {
+            return I2C_STATUS_TIMEOUT;
+        }
+    }
+}
+uint8_t I2C_MasterTransmitWithTimeout(I2C_Handle_t *pI2CHandle,I2C_TransferConfig_t *pTransfer,uint8_t *pTxBuffer)
+{
+    uint8_t status;
+    I2C_RegDef_t *pI2Cx;
+
+    if ((pI2CHandle == 0) || (pTransfer == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if ((pTransfer->NumBytes > 0U) && (pTxBuffer == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2Cx = pI2CHandle->pI2Cx;
+
+    status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                        I2C_FLAG_BUSY,
+                                        RESET,
+                                        pTransfer->TimeoutMs,
+                                        I2C_STATUS_BUSY_TIMEOUT);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    status = I2C_ConfigMasterTransfer(pI2Cx, pTransfer);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    /*
+     * Generate START.
+     */
+    pI2Cx->I2C_CR2 |= (1U << I2C_CR2_START);
+
+    for (uint32_t i = 0U; i < pTransfer->NumBytes; i++)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_TXIS,
+                                            SET,
+                                            pTransfer->TimeoutMs,
+                                            I2C_STATUS_TXIS_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        pI2Cx->I2C_TXDR = pTxBuffer[i];
+    }
+
+    if (pTransfer->AutoEnd == I2C_AUTOEND_ENABLE)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_STOPF,
+                                            SET,
+                                            pTransfer->TimeoutMs,
+                                            I2C_STATUS_STOP_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        I2C_ClearSTOPFlag(pI2Cx);
+    }
+    else
+    {
+        /*
+         * Software end mode.
+         * No STOP generated. TC means transfer complete and bus is held.
+         * This state allows repeated START.
+         */
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_TC,
+                                            SET,
+                                            pTransfer->TimeoutMs,
+                                            I2C_STATUS_TC_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+    }
+
+    return I2C_STATUS_OK;
+}
+uint8_t I2C_MasterReceiveWithTimeout(I2C_Handle_t *pI2CHandle,
+                                     I2C_TransferConfig_t *pTransfer,
+                                     uint8_t *pRxBuffer)
+{
+    uint8_t status;
+    I2C_RegDef_t *pI2Cx;
+
+    if ((pI2CHandle == 0) || (pTransfer == 0) || (pRxBuffer == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if (pTransfer->NumBytes == 0U)
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2Cx = pI2CHandle->pI2Cx;
+
+    status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                        I2C_FLAG_BUSY,
+                                        RESET,
+                                        pTransfer->TimeoutMs,
+                                        I2C_STATUS_BUSY_TIMEOUT);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    status = I2C_ConfigMasterTransfer(pI2Cx, pTransfer);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    /*
+     * Generate START.
+     */
+    pI2Cx->I2C_CR2 |= (1U << I2C_CR2_START);
+
+    for (uint32_t i = 0U; i < pTransfer->NumBytes; i++)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_RXNE,
+                                            SET,
+                                            pTransfer->TimeoutMs,
+                                            I2C_STATUS_RXNE_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        pRxBuffer[i] = (uint8_t)pI2Cx->I2C_RXDR;
+    }
+
+    if (pTransfer->AutoEnd == I2C_AUTOEND_ENABLE)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_STOPF,
+                                            SET,
+                                            pTransfer->TimeoutMs,
+                                            I2C_STATUS_STOP_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        I2C_ClearSTOPFlag(pI2Cx);
+    }
+    else
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_TC,
+                                            SET,
+                                            pTransfer->TimeoutMs,
+                                            I2C_STATUS_TC_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+    }
+
+    return I2C_STATUS_OK;
+}
+
+uint8_t I2C_MasterWriteReadWithTimeout(I2C_Handle_t *pI2CHandle,
+                                       uint16_t SlaveAddr,
+                                       uint8_t AddressMode,
+                                       uint8_t *pTxBuffer,
+                                       uint32_t TxLen,
+                                       uint8_t *pRxBuffer,
+                                       uint32_t RxLen,
+                                       uint32_t TimeoutMs)
+{
+    uint8_t status;
+    I2C_RegDef_t *pI2Cx;
+    I2C_TransferConfig_t transfer;
+
+    if ((pI2CHandle == 0) ||
+        (pTxBuffer == 0) ||
+        (pRxBuffer == 0) ||
+        (TxLen == 0U) ||
+        (RxLen == 0U))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if ((TxLen > 255U) || (RxLen > 255U))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2Cx = pI2CHandle->pI2Cx;
+
+    /*
+     * Wait until bus is free before first START.
+     */
+    status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                        I2C_FLAG_BUSY,
+                                        RESET,
+                                        TimeoutMs,
+                                        I2C_STATUS_BUSY_TIMEOUT);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    /*
+     * Phase-1:
+     * Write register address or command bytes.
+     * AUTOEND = 0, so STOP is not generated.
+     * TC will be set after TxLen bytes.
+     */
+    transfer.SlaveAddress = SlaveAddr;
+    transfer.AddressMode = AddressMode;
+    transfer.Direction = I2C_TRANSFER_WRITE;
+    transfer.AutoEnd = I2C_AUTOEND_DISABLE;
+    transfer.Reload = I2C_RELOAD_DISABLE;
+    transfer.Head10R = I2C_HEAD10R_COMPLETE_SEQ;
+    transfer.NumBytes = TxLen;
+    transfer.TimeoutMs = TimeoutMs;
+
+    status = I2C_ConfigMasterTransfer(pI2Cx, &transfer);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    pI2Cx->I2C_CR2 |= (1U << I2C_CR2_START);
+
+    for (uint32_t i = 0U; i < TxLen; i++)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_TXIS,
+                                            SET,
+                                            TimeoutMs,
+                                            I2C_STATUS_TXIS_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        pI2Cx->I2C_TXDR = pTxBuffer[i];
+    }
+
+    /*
+     * Wait TC.
+     * Since AUTOEND = 0, bus is held and no STOP is generated.
+     */
+    status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                        I2C_FLAG_TC,
+                                        SET,
+                                        TimeoutMs,
+                                        I2C_STATUS_TC_TIMEOUT);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    /*
+     * Phase-2:
+     * Repeated START + read.
+     */
+    transfer.SlaveAddress = SlaveAddr;
+    transfer.AddressMode = AddressMode;
+    transfer.Direction = I2C_TRANSFER_READ;
+    transfer.AutoEnd = I2C_AUTOEND_ENABLE;
+    transfer.Reload = I2C_RELOAD_DISABLE;
+    transfer.Head10R = I2C_HEAD10R_HEADER_ONLY;
+    transfer.NumBytes = RxLen;
+    transfer.TimeoutMs = TimeoutMs;
+
+    status = I2C_ConfigMasterTransfer(pI2Cx, &transfer);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    /*
+     * START while BUSY=1 and TC=1 creates repeated START.
+     */
+    pI2Cx->I2C_CR2 |= (1U << I2C_CR2_START);
+
+    for (uint32_t i = 0U; i < RxLen; i++)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_RXNE,
+                                            SET,
+                                            TimeoutMs,
+                                            I2C_STATUS_RXNE_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        pRxBuffer[i] = (uint8_t)pI2Cx->I2C_RXDR;
+    }
+
+    status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                        I2C_FLAG_STOPF,
+                                        SET,
+                                        TimeoutMs,
+                                        I2C_STATUS_STOP_TIMEOUT);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    I2C_ClearSTOPFlag(pI2Cx);
+
+    return I2C_STATUS_OK;
+}

@@ -1,0 +1,2 @@
+../Examples/Src/ex004_gpio_deinit_test.c:10:13:delay	16	static
+../Examples/Src/ex004_gpio_deinit_test.c:15:6:EX004_GPIO_DeInitTest	24	static

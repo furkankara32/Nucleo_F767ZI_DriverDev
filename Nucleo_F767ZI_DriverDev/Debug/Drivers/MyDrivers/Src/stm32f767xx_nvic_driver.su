@@ -1,0 +1,2 @@
+../Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.c:8:6:NVIC_IRQInterruptConfig	24	static
+../Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.c:26:6:NVIC_IRQPriorityConfig	24	static

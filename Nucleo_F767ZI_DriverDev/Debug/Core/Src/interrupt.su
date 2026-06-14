@@ -1,0 +1,16 @@
+../Core/Src/interrupt.c:11:6:EXTI0_IRQHandler	8	static
+../Core/Src/interrupt.c:16:6:EXTI1_IRQHandler	8	static
+../Core/Src/interrupt.c:21:6:EXTI2_IRQHandler	8	static
+../Core/Src/interrupt.c:26:6:EXTI3_IRQHandler	8	static
+../Core/Src/interrupt.c:31:6:EXTI4_IRQHandler	8	static
+../Core/Src/interrupt.c:36:6:EXTI9_5_IRQHandler	16	static
+../Core/Src/interrupt.c:44:6:EXTI15_10_IRQHandler	16	static
+../Core/Src/interrupt.c:51:6:SysTick_Handler	8	static
+../Core/Src/interrupt.c:55:6:USART1_IRQHandler	8	static
+../Core/Src/interrupt.c:59:6:USART2_IRQHandler	8	static
+../Core/Src/interrupt.c:63:6:USART3_IRQHandler	8	static
+../Core/Src/interrupt.c:68:6:UART4_IRQHandler	8	static
+../Core/Src/interrupt.c:72:6:UART5_IRQHandler	8	static
+../Core/Src/interrupt.c:76:6:USART6_IRQHandler	8	static
+../Core/Src/interrupt.c:80:6:UART7_IRQHandler	8	static
+../Core/Src/interrupt.c:84:6:UART8_IRQHandler	8	static

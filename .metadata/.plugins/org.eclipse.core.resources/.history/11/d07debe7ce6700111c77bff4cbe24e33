@@ -1,0 +1,140 @@
+/*
+ * stm32f767xx_i2c_driver.h
+ *
+ *  Created on: Jun 12, 2026
+ *      Author: furkan
+ */
+
+#ifndef MYDRIVERS_INC_STM32F767XX_I2C_DRIVER_H_
+#define MYDRIVERS_INC_STM32F767XX_I2C_DRIVER_H_
+
+#include "stm32f767xx.h"
+
+/*
+ * I2C status codes
+ */
+#define I2C_STATUS_OK              0U
+#define I2C_STATUS_TIMEOUT         1U
+#define I2C_STATUS_ERROR           2U
+#define I2C_STATUS_BUSY_TIMEOUT    3U
+#define I2C_STATUS_TXIS_TIMEOUT    4U
+#define I2C_STATUS_RXNE_TIMEOUT    5U
+#define I2C_STATUS_TC_TIMEOUT      6U
+#define I2C_STATUS_STOP_TIMEOUT    7U
+#define I2C_STATUS_NACK            8U
+
+/*
+ * I2C analog filter
+ *
+ * In CR1:
+ * ANFOFF = 0 -> analog filter enabled
+ * ANFOFF = 1 -> analog filter disabled
+ */
+#define I2C_ANALOG_FILTER_ENABLE    0U
+#define I2C_ANALOG_FILTER_DISABLE   1U
+
+/*
+ * I2C clock stretching
+ *
+ * NOSTRETCH = 0 -> clock stretching enabled
+ * NOSTRETCH = 1 -> clock stretching disabled
+ */
+#define I2C_CLOCK_STRETCH_ENABLE    0U
+#define I2C_CLOCK_STRETCH_DISABLE   1U
+
+/*
+ * Common TIMINGR values
+ *
+ * Initial project assumption:
+ * I2C kernel clock = 16 MHz
+ * Standard mode = 100 kHz
+ */
+#define I2C_TIMING_16MHZ_100KHZ     0x30420F13U
+
+/*
+ * I2C slave address mode
+ */
+#define I2C_ADDR_MODE_7BIT       0U
+#define I2C_ADDR_MODE_10BIT      1U
+
+/*
+ * I2C transfer direction
+ */
+#define I2C_TRANSFER_WRITE       0U
+#define I2C_TRANSFER_READ        1U
+
+/*
+ * I2C auto end
+ */
+#define I2C_AUTOEND_DISABLE      0U
+#define I2C_AUTOEND_ENABLE       1U
+
+/*
+ * I2C reload mode
+ */
+#define I2C_RELOAD_DISABLE          0U
+#define I2C_RELOAD_ENABLE           1U
+
+/*
+ * I2C 10-bit read header mode
+ */
+#define I2C_HEAD10R_COMPLETE_SEQ    0U
+#define I2C_HEAD10R_HEADER_ONLY     1U
+
+/*
+ * I2C error mask values
+ */
+#define I2C_ERROR_NONE              0x00U
+#define I2C_ERROR_BERR              0x01U
+#define I2C_ERROR_ARLO              0x02U
+#define I2C_ERROR_OVR               0x04U
+#define I2C_ERROR_TIMEOUT           0x08U
+#define I2C_ERROR_NACK              0x10U
+
+typedef struct
+{
+    uint32_t I2C_Timing;
+    uint8_t I2C_AnalogFilter;
+    uint8_t I2C_DigitalFilter;
+    uint8_t I2C_ClockStretch;
+} I2C_Config_t;
+
+typedef struct
+{
+    I2C_RegDef_t *pI2Cx;
+    I2C_Config_t I2C_Config;
+} I2C_Handle_t;
+
+
+/*
+ * Peripheral clock setup
+ */
+void I2C_PeriClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi);
+
+/*
+ * Init / DeInit
+ */
+uint8_t I2C_Init(I2C_Handle_t *pI2CHandle);
+void I2C_DeInit(I2C_RegDef_t *pI2Cx);
+
+/*
+ * Peripheral control
+ */
+void I2C_PeripheralControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi);
+
+/*
+ * Flag / error helpers
+ */
+uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t FlagName);
+
+uint8_t I2C_GetErrorStatus(I2C_RegDef_t *pI2Cx);
+void I2C_ClearErrorFlags(I2C_RegDef_t *pI2Cx);
+void I2C_ClearSTOPFlag(I2C_RegDef_t *pI2Cx);
+void I2C_ClearNACKFlag(I2C_RegDef_t *pI2Cx);
+
+uint8_t I2C_MasterTransmitWithTimeout(I2C_Handle_t *pI2CHandle,I2C_TransferConfig_t *pTransfer,uint8_t *pTxBuffer);
+uint8_t I2C_MasterReceiveWithTimeout(I2C_Handle_t *pI2CHandle, I2C_TransferConfig_t *pTransfer,uint8_t *pRxBuffer);
+uint8_t I2C_MasterWriteReadWithTimeout(I2C_Handle_t *pI2CHandle, uint16_t SlaveAddr,uint8_t AddressMode,uint8_t *pTxBuffer,uint32_t TxLen, uint8_t *pRxBuffer,uint32_t RxLen, uint32_t TimeoutMs);
+uint8_t I2C_IsDeviceReadyWithTimeout(I2C_Handle_t *pI2CHandle, uint16_t SlaveAddr,uint8_t AddressMode,uint32_t TimeoutMs);
+
+#endif /* MYDRIVERS_INC_STM32F767XX_I2C_DRIVER_H_ */

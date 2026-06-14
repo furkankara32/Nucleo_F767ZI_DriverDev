@@ -1,0 +1,89 @@
+/*
+ * ex007_usart3_tx.c
+ *
+ *  Created on: Jun 6, 2026
+ *      Author: furkan
+ */
+
+#include "stm32f767xx_gpio_driver.h"
+#include "stm32f767xx_usart_driver.h"
+#include "stm32f767xx_systick_driver.h"
+#include "examples_config.h"
+
+#if ACTIVE_EXAMPLE == EXAMPLE_USART3_TX
+
+static USART_Handle_t USART3Handle;
+
+static void USART3_GPIOInits(void)
+{
+	GPIO_Handle_t GpioUart;
+
+	/*
+	 * USART3_TX -> PD8
+	 * USART3_RX -> PD9
+	 * Alternate Function: AF7
+	 */
+	GpioUart.pGPIOx = GPIOD;
+	GpioUart.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
+	GpioUart.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
+	GpioUart.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_PIN_PU;
+	GpioUart.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+	GpioUart.GPIO_PinConfig.GPIO_PinAltFunMode = 7U;
+
+	GpioUart.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_8;
+	GPIO_Init(&GpioUart);
+
+	GpioUart.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_9;
+	GPIO_Init(&GpioUart);
+
+}
+
+static uint8_t USART3_Inits(void)
+{
+	uint8_t status;
+	USART3Handle.pUSARTx = USART3;
+
+	USART3Handle.USART_Config.USART_Mode = USART_MODE_TXRX;
+	USART3Handle.USART_Config.USART_Baud = 115200;
+	USART3Handle.USART_Config.USART_WordLength = USART_WORDLEN_8BITS;
+	USART3Handle.USART_Config.USART_StopBits = USART_STOPBITS_1;
+	USART3Handle.USART_Config.USART_ParityControl = USART_PARITY_DISABLE;
+	USART3Handle.USART_Config.USART_Oversampling = USART_OVERSAMPLING_16;
+
+	USART3Handle.USART_Config.USART_PeripheralClockHz = 0U;
+
+	status = USART_Init(&USART3Handle);
+
+	return status;
+}
+
+void EX007_USART3_Tx(void)
+{
+	uint8_t msg[] = "USART3 TX timeout test from NUCLEO-F767ZI\r\n";
+	uint8_t status;
+
+	SysTick_Init(16000000U);
+
+	USART3_GPIOInits();
+	if(USART3_Inits(); != USART_STATUS_OK)
+	{
+		while(1);
+	}
+
+	while(1)
+		{
+			status = USART_SendDataWithTimeout(&USART3Handle, msg, sizeof(msg) - 1U, 100);
+
+			if(status == USART_STATUS_OK)
+			{
+				delay_ms(1000U);
+			}
+			else
+			{
+				delay_ms(100U);
+			}
+		}
+
+
+}
+#endif /* ACTIVE_EXAMPLE == EXAMPLE_USART3_TX */

@@ -1,0 +1,2 @@
+../Examples/Src/ex002_gpio_led_set_reset.c:10:13:delay	2
+../Examples/Src/ex002_gpio_led_set_reset.c:15:6:EX002_GPIO_LedSetReset	1

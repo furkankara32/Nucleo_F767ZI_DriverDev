@@ -1,0 +1,427 @@
+/*
+ * stm32f767xx_spi_driver.c
+ *
+ *  Created on: Jun 7, 2026
+ *      Author: furkan
+ */
+
+#include "stm32f767xx_spi_driver.h"
+#include "stm32f767xx_systick_driver.h"
+
+static uint8_t SPI_WaitOnFlagUntilTimeout(SPI_RegDef_t *pSPIx, uint32_t Flagname, uint8_t DesiredStatus, uint32_t TimeoutMs)
+{
+	uint32_t start_tick = millis();
+
+	while(SPI_GetFlagStatus(pSPIx, Flagname) != DesiredStatus)
+	{
+		if((millis() - start_tick) >= TimeoutMs)
+		{
+			return SPI_STATUS_TIMEOUT;
+		}
+	}
+
+	return SPI_STATUS_OK;
+}
+
+void SPI_PeriClockControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
+{
+	if (EnorDi == ENABLE)
+	{
+		if (pSPIx == SPI1)
+		{
+			SPI1_PCLK_EN();
+		}
+		else if (pSPIx == SPI2)
+		{
+			SPI2_PCLK_EN();
+		}
+		else if (pSPIx == SPI3)
+		{
+			SPI3_PCLK_EN();
+		}
+		else if (pSPIx == SPI4)
+		{
+			SPI4_PCLK_EN();
+		}
+		else if (pSPIx == SPI5)
+		{
+			SPI5_PCLK_EN();
+		}
+		else if (pSPIx == SPI6)
+		{
+			SPI6_PCLK_EN();
+		}
+	}
+	else
+	{
+		if (pSPIx == SPI1)
+		{
+			SPI1_PCLK_DI();
+		}
+		else if (pSPIx == SPI2)
+		{
+			SPI2_PCLK_DI();
+		}
+		else if (pSPIx == SPI3)
+		{
+			SPI3_PCLK_DI();
+		}
+		else if (pSPIx == SPI4)
+		{
+			SPI4_PCLK_DI();
+		}
+		else if (pSPIx == SPI5)
+		{
+			SPI5_PCLK_DI();
+		}
+		else if (pSPIx == SPI6)
+		{
+			SPI6_PCLK_DI();
+		}
+	}
+}
+
+uint8_t SPI_Init(SPI_Handle_t *pSPIHandle)
+{
+	uint32_t tempreg = 0U;
+
+	if(pSPIHandle == 0)
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	/*
+	 * 1. Enable SPI peripheral clock
+	 */
+	SPI_PeriClockControl(pSPIHandle->pSPIx, ENABLE);
+
+	/*
+	 * Disable SPI before configurations
+	 */
+	SPI_PeripheralControl(pSPIHandle->pSPIx, DISABLE);
+
+	/*
+	 * 3. Device Mode
+	 */
+
+	if(pSPIHandle->SPI_Config.SPI_DeviceMode == SPI_DEVICE_MODE_MASTER)
+	{
+		tempreg |= (1U << SPI_CR1_MSTR);
+	}else if(pSPIHandle->SPI_Config.SPI_DeviceMode == SPI_DEVICE_MODE_SLAVE)
+	{
+		tempreg &= ~(1U << SPI_CR1_MSTR);
+	}
+	else
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	/*
+	 *  4.Bus Config
+	 */
+	if(pSPIHandle->SPI_Config.SPI_BusConfig == SPI_BUS_CONFIG_FULL_DUPLEX)
+	{
+		tempreg &= ~(1U << SPI_CR1_BIDIMODE);
+		tempreg &= ~(1U << SPI_CR1_RXONLY);
+	}else if(pSPIHandle->SPI_Config.SPI_BusConfig == SPI_BUS_CONFIG_HALF_DUPLEX)
+	{
+		tempreg |= (1U << SPI_CR1_BIDIMODE);
+		//RxOnly dont care
+	}else if(pSPIHandle->SPI_Config.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_RXONLY)
+	{
+		tempreg &= ~(1U << SPI_CR1_BIDIMODE);
+		tempreg |= (1U << SPI_CR1_RXONLY);
+	}else
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	/*
+	 * 5. SPI serial clock speed
+	 * BR[2:0] = CR1[5:3]
+	 */
+	tempreg &= ~(7U << SPI_CR1_BR);
+	tempreg |= ((uint32_t)pSPIHandle->SPI_Config.SPI_SclkSpeed << SPI_CR1_BR);
+
+	/*
+	 * 6. CPOL/CPHA
+	 */
+	if(pSPIHandle->SPI_Config.SPI_CPOL == SPI_CPOL_HIGH)
+	{
+		tempreg |= (1U << SPI_CR1_CPOL);
+	}
+
+	if(pSPIHandle->SPI_Config.SPI_CPHA == SPI_CPHA_SECOND_EDGE)
+	{
+		tempreg |= (1U << SPI_CR1_CPHA);
+	}
+
+	/*
+	 * 7. Software slave management
+	 */
+	if(pSPIHandle->SPI_Config.SPI_SSM == SPI_SSM_ENABLE)
+	{
+		tempreg |= (1U << SPI_CR1_SSM);
+		tempreg |= (1U << SPI_CR1_SSI);
+	}
+	else
+	{
+		tempreg &= ~(1U << SPI_CR1_SSM);
+	}
+
+	/*
+	 * 8. Write CR1 config
+	 */
+	pSPIHandle->pSPIx->SPI_CR1 = tempreg;
+
+	/*
+	 * 9. Configure data size
+	 * 0111 = 8-bit
+	 * 1111 = 16-bit
+	 */
+
+	pSPIHandle->pSPIx->SPI_CR2 &= ~(0xFU << SPI_CR2_DS);
+
+	if(pSPIHandle->SPI_Config.SPI_DataSize == SPI_DATA_SIZE_8BIT)
+	{
+		pSPIHandle->pSPIx->SPI_CR2 |= (15U << SPI_CR2_DS);
+		pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_FRXTH);
+	}else if(pSPIHandle->SPI_Config.SPI_DataSize == SPI_DATA_SIZE_16BIT)
+	{
+		pSPIHandle->pSPIx->SPI_CR2 |= (15U << SPI_CR2_DS);
+		pSPIHandle->pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_FRXTH);
+	}
+	else
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	return SPI_STATUS_OK;
+}
+
+void SPI_DeInit(SPI_RegDef_t *pSPIx)
+{
+	if (pSPIx == SPI1)
+	{
+		SPI1_REG_RESET();
+	}
+	else if (pSPIx == SPI2)
+	{
+		SPI2_REG_RESET();
+	}
+	else if (pSPIx == SPI3)
+	{
+		SPI3_REG_RESET();
+	}
+	else if (pSPIx == SPI4)
+	{
+		SPI4_REG_RESET();
+	}
+	else if (pSPIx == SPI5)
+	{
+		SPI5_REG_RESET();
+	}
+	else if (pSPIx == SPI6)
+	{
+		SPI6_REG_RESET();
+	}
+}
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
+{
+	if (EnorDi == ENABLE)
+	{
+		pSPIx->SPI_CR1 |= (1U << SPI_CR1_SPE);
+	}
+	else
+	{
+		pSPIx->SPI_CR1 &= ~(1U << SPI_CR1_SPE);
+	}
+}
+
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName)
+{
+	if (pSPIx->SPI_SR & FlagName)
+	{
+		return SET;
+	}
+
+	return RESET;
+}
+static void SPI_WriteData8(SPI_RegDef_t *pSPIx, uint8_t data)
+{
+	/*
+	 * Acces DR with 8-bit width
+	 */
+	*((volatile uint8_t *)&pSPIx->SPI_DR) = data;
+}
+static uint8_t SPI_ReadData8(SPI_RegDef_t *pSPIx)
+{
+	return *((volatile uint8_t *)&pSPIx->SPI_DR);
+}
+static uint8_t SPI_WaitUntilNotBusy(SPI_RegDef_t *pSPIx, uint32_t TimeoutMs)
+{
+	uint8_t status;
+
+	status = SPI_WaitOnFlagUntilTimeout(pSPIx, SPI_FLAG_BSY, RESET, TimeoutMs);
+
+	if(status != SPI_STATUS_OK)
+	{
+		return SPI_STATUS_BUSY_TIMEOUT;
+	}
+	return SPI_STATUS_OK;
+}
+uint8_t SPI_GetErrorStatus(SPI_RegDef_t *pSPIx)
+{
+	uint8_t error_Status = SPI_ERROR_NONE;
+
+	if(pSPIx->SPI_SR & SPI_FLAG_OVR)
+	{
+		error_Status |= SPI_ERROR_OVR;
+	}
+	if(pSPIx->SPI_SR & SPI_FLAG_MODF)
+	{
+		error_Status |= SPI_ERROR_MODF;
+	}
+	if(pSPIx->SPI_SR & SPI_FLAG_CRCERR)
+	{
+		error_Status |= SPI_ERROR_CRC;
+	}
+	if(pSPIx->SPI_SR & SPI_FLAG_FRE)
+	{
+		error_Status |= SPI_ERROR_FRE;
+	}
+
+	return error_status;
+}
+void SPI_ClearOVRFlag(SPI_RegDef_t *pSPIx)
+{
+	volatile uint32_t temp;
+	/*
+	 * OVR is cleared by reading DR fallowed by reading SR
+	 */
+	temp = pSPIx->SPI_DR;
+	temp = pSPIx->SPI_SR;
+
+	(void)temp;
+}
+
+uint8_t SPI_SendDataWithTimeout(SPI_Handle_t *pSPIHandle,uint8_t *pTxBuffer,uint32_t Len,uint32_t TimeoutMs)
+{
+	uint8_t status;
+	uint8_t dummy_read;
+
+	if( (pSPIHandle == 0) || (pTxBuffer == 0) || (Len == 0U) )
+	{
+		return SPI_STATUS_ERROR;
+	}
+	if(pSPIHandle->SPI_Config.SPI_DataSize != SPI_DATA_SIZE_8BIT)
+	{
+		return SPI_STATUS_ERROR;
+	}
+	if(pSPIHandle->SPI_Config.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_RXONLY)
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	/*
+	 * Half Dupblex Mode
+	 */
+	if(pSPIHandle->SPI_Config.SPI_BusConfig == SPI_BUS_CONFIG_HALF_DUPLEX)
+	{
+		pSPIHandle->pSPIx->SPI_CR1 |= (1U << SPI_CR1_BIDIOE); // Transmit only mode
+	}
+	for(uint32_t i = 0U; i<Len; i++)
+	{
+		status = SPI_WaitOnFlagUntilTimeout(pSPIHandle->pSPIx, SPI_FLAG_TXE, SET, TimeoutMs);
+
+		if(status != SPI_STATUS_OK)
+		{
+			return SPI_STATUS_TXE_TIMEOUT;
+		}
+
+		SPI_WriteData8(pSPIHandle->pSPIx, pTxBuffer[i]);
+
+
+		/*
+		 * Full Duplex Mode
+		 * After every transmitted byte you should also receives one byte.
+		 * Dummy read avoid OVR
+		 */
+
+		if(pSPIHandle->SPI_Config.SPI_BusConfig == SPI_BUS_CONFIG_FULL_DUPLEX)
+		{
+			status = SPI_WaitOnFlagUntilTimeout(pSPIHandle->pSPIx, SPI_FLAG_RXNE, SET, TimeoutMs);
+
+			if(status != SPI_STATUS_OK)
+			{
+				return SPI_STATUS_RXNE_TIMEOUT;
+			}
+
+			dummy_read = SPI_ReadData8(pSPIHandle->pSPIx);
+			(void)dummy_read;
+		}
+	}
+
+	status = SPI_WaitUntilNotBusy(pSPIHandle->pSPIx,TimeoutMs);
+
+	if(status != SPI_STATUS_OK)
+	{
+		return status;
+	}
+
+	return SPI_STATUS_OK;
+}
+
+uint8_t SPI_ReceiveDataWithTimeout(SPI_Handle_t *pSPIHandle,uint8_t *pRxBuffer,uint32_t Len,uint32_t TimeoutMs)
+{
+	uint8_t status;
+	uint8_t dummy_tx = 0xFFU;
+
+	if((pSPIHandle == 0) || (pRxBuffer == 0) || (Len == 0U))
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	if(pSPIHandle->SPI_Config.SPI_DataSize != SPI_DATA_SIZE_8BIT)
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	if(pSPIHandle->SPI_Config.SPI_BusConfig != SPI_BUS_CONFIG_FULL_DUPLEX)
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	for(uint32_t i = 0U; i<Len; i++)
+	{
+		status = SPI_WaitOnFlagUntilTimeout(pSPIHandle->pSPIx, SPI_FLAG_TXE, SET, TimeoutMs);
+
+		if(status != SPI_STATUS_OK)
+		{
+			return SPI_STATUS_TXE_TIMEOUT;
+		}
+
+		SPI_WriteData8(pSPIHandle->pSPIx, dummy_tx);
+
+		status = SPI_WaitOnFlagUntilTimeout(pSPIHandle->pSPIx, SPI_FLAG_RXNE, SET, TimeoutMs);
+
+		if(status != SPI_STATUS_OK)
+		{
+			return SPI_STATUS_RXNE_TIMEOUT;
+		}
+
+		pRxBuffer[i] = SPI_ReadData8(pSPIHandle->pSPIx);
+	}
+
+	status = SPI_WaitUntilNotBusy(pSPIHandle->pSPIx, TimeoutMs);
+
+	if(status != SPI_STATUS_OK)
+	{
+		return status;
+	}
+
+	return SPI_STATUS_OK;
+
+}
+
+

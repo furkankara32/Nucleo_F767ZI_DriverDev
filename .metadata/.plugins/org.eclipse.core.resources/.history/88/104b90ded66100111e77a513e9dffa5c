@@ -1,0 +1,374 @@
+/*
+ * ex011_usart3_packet_parser.c
+ *
+ *  Created on: Jun 6, 2026
+ *      Author: furkan
+ */
+
+#include "stm32f767xx_gpio_driver.h"
+#include "stm32f767xx_usart_driver.h"
+#include "stm32f767xx_systick_driver.h"
+#include "stm32f767xx_nvic_driver.h"
+#include "examples_config.h"
+
+#if ACTIVE_EXAMPLE == EXAMPLE_USART3_PACKET_PARSER
+
+#define PACKET_START_BYTE       0xAAU
+#define PACKET_MAX_PAYLOAD      32U
+
+#define PACKET_STATUS_NONE              0U
+#define PACKET_STATUS_OK                1U
+#define PACKET_STATUS_CHECKSUM_ERROR    2U
+#define PACKET_STATUS_LENGTH_ERROR      3U
+
+typedef enum
+{
+	PARSER_WAIT_START = 0,
+	PARSER_READ_LENGTH,
+	PARSER_READ_MSG_ID,
+	PARSER_READ_PAYLOAD,
+	PARSER_READ_CHECKSUM
+}PacketParserState_t;
+
+typedef struct
+{
+	uint8_t msg_id;
+	uint8_t length;
+	uint8_t payload[PACKET_MAX_PAYLOAD]
+}DronePacket_t;
+
+typedef struct
+{
+	PacketParserState_t state;
+
+	uint8_t length;
+	uint8_t msg_id;
+	uint8_t payload[PACKET_MAX_PAYLOAD];
+	uint8_t payload_index;
+	uint8_t checksum;
+}PacketParser_t;
+
+static USART_Handle_t USART3Handle;
+static uint8_t USART3_RxRingBuffer[128];
+
+static volatile uint32_t g_usart3_rx_overflow_count = 0;
+static volatile uint32_t g_usart3_error_count = 0;
+static volatile uint32_t g_packet_ok_count = 0;
+static volatile uint32_t g_packet_checksum_error_count = 0;
+static volatile uint32_t g_packet_length_error_count = 0;
+
+static void USART3_SendString(const char *str)
+{
+	uint32_t len = 0U;
+
+	while (str[len] != '\0')
+	{
+		len++;
+	}
+	USART_SendDataWithTimeout(&USART3Handle, (uint8_t*)str, len, 100U);
+
+}
+
+static USART3_SendHexNibble(uint8_t value)
+{
+	uint8_t ch;
+
+	value &= 0x0FU;
+
+	if(value < 10U)
+	{
+		ch = '0' + value;
+	}
+	else
+	{
+		ch = 'A' + (value - 10U);
+	}
+
+	USART_SendDataWithTimeout(&USART3Handle, &ch, 1U, 100U);
+}
+static void USART3_SendHex8(uint8_t value)
+{
+	USART3_SendHexNibble(value >> 4U);
+	USART3_SendHexNibble(value);
+}
+static void USART3_SendDecU8(uint8_t value)
+{
+	uint8_t ch;
+
+	if(value >= 100U)
+	{
+		ch = '0' + (value / 100U);
+		USART_SendDataWithTimeout(&USART3Handle, &ch, 1U, 100U);
+
+		value %= 100U;
+
+		ch = '0' + (value / 10U);
+		USART_SendDataWithTimeout(&USART3Handle, &ch, 1U, 100U);
+
+		ch = '0' + (value % 10U);
+		USART_SendDataWithTimeout(&USART3Handle, &ch, 1U, 100U);
+	}
+	else if (value >= 10U)
+	{
+		ch = '0' + (value / 10U);
+		USART_SendDataWithTimeout(&USART3Handle, &ch, 1U, 100U);
+
+		ch = '0' + (value % 10U);
+		USART_SendDataWithTimeout(&USART3Handle, &ch, 1U, 100U);
+	}
+	else
+	{
+		ch = '0' + value;
+		USART_SendDataWithTimeout(&USART3Handle, &ch, 1U, 100U);
+	}
+}
+static void PacketParser_Reset(PacketParser_t *parser)
+{
+	parser->state = PARSER_WAIT_START;
+	parser->length = 0U;
+	parser->msg_id = 0U;
+	parser->payload_index = 0U;
+	parser->checksum = 0U;
+}
+
+static uint8_t PacketParser_ProcessByte(PacketParser_t *parser, uint8_t byte, DronePacket_t *out_packet)
+{
+	switch(parser->state)
+	{
+		case PARSER_WAIT_START:
+		{
+			if(byte == PACKET_START_BYTE)
+			{
+				parser->checksum = byte;
+				parser->payload_index = 0U;
+				parser->state = PARSER_READ_LENGTH;
+			}
+			break;
+		}
+		case PARSER_READ_LENGTH:
+		{
+			parser->length = byte;
+			parser->checksum ^= byte;
+
+			if(parser->length > PACKET_MAX_PAYLOAD)
+			{
+				PacketParser_Reset(parser);
+				return PACKET_STATUS_LENGTH_ERROR;
+			}
+
+			parser->state = PARSER_READ_MSG_ID;
+			break;
+		}
+		case PARSER_READ_MSG_ID:
+		{
+			parser->msg_id = byte;
+			parser->checksum ^= byte;
+
+			if(parser->length == 0U)
+			{
+				parser->state = PARSER_READ_CHECKSUM;
+			}
+			else
+			{
+				parser->payload_index = 0U;
+				parser->state = PARSER_READ_PAYLOAD;
+			}
+
+			break;
+		}
+		case PARSER_READ_PAYLOAD:
+		{
+			parser->payload[parser->payload_index] = byte;
+			parser->checksum ^= byte;
+
+			parser->payload_index++;
+
+			if(parser->payload_index >= parser->length)
+			{
+				parser->state = PARSER_READ_CHECKSUM;
+			}
+
+			break;
+		}
+		case PARSER_READ_CHECKSUM:
+		{
+			if(byte == parser->checksum)
+			{
+				out_packet->msg_id = parser->msg_id;
+				out_packet->length = parser->length;
+
+				for (uint8_t i = 0U; i < parser->length; i++)
+				{
+					out_packet->payload[i] = parser->payload[i];
+				}
+
+				PacketParser_Reset(parser);
+				return PACKET_STATUS_OK;
+			}
+			else
+			{
+				PacketParser_Reset(parser);
+				return PACKET_STATUS_CHECKSUM_ERROR;
+			}
+		}
+		default:
+		{
+			PacketParser_Reset(parser);
+			break;
+		}
+
+	}
+	return PACKET_STATUS_NONE;
+}
+static void SendPacketInfo(DronePacket_t *packet)
+{
+	USART3_SendString("\r\nVALID PACKET\r\n");
+
+	USART3_SendString("ID     : 0x");
+	USART3_SendHex8(packet->msg_id);
+	USART3_SendString("\r\n");
+
+	USART3_SendString("LENGTH : ");
+	USART3_SendDecU8(packet->length);
+	USART3_SendString("\r\n");
+
+	USART3_SendString("PAYLOAD: ");
+
+	for (uint8_t i = 0U; i < packet->length; i++)
+	{
+		USART_SendDataWithTimeout(&USART3Handle,
+								   &packet->payload[i],
+								   1U,
+								   100U);
+	}
+
+	USART3_SendString("\r\n");
+}
+static void USART3_GPIOInits(void)
+{
+	GPIO_Handle_t GpioUart;
+
+	/*
+	 * USART3_TX -> PD8
+	 * USART3_RX -> PD9
+	 * Alternate Function: AF7
+	 */
+	GpioUart.pGPIOx = GPIOD;
+	GpioUart.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
+	GpioUart.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
+	GpioUart.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_PIN_PU;
+	GpioUart.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+	GpioUart.GPIO_PinConfig.GPIO_PinAltFunMode = 7U;
+
+	GpioUart.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_8;
+	GPIO_Init(&GpioUart);
+
+	GpioUart.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_9;
+	GPIO_Init(&GpioUart);
+}
+
+static void USART3_Inits(void)
+{
+	USART3Handle.pUSARTx = USART3;
+
+	USART3Handle.USART_Config.USART_Mode = USART_MODE_TXRX;
+	USART3Handle.USART_Config.USART_Baud = 115200U;
+	USART3Handle.USART_Config.USART_WordLength = USART_WORDLEN_8BITS;
+	USART3Handle.USART_Config.USART_StopBits = USART_STOPBITS_1;
+	USART3Handle.USART_Config.USART_ParityControl = USART_PARITY_DISABLE;
+	USART3Handle.USART_Config.USART_Oversampling = USART_OVERSAMPLING_16;
+	USART3Handle.USART_Config.USART_PeripheralClockHz = 16000000U;
+
+	USART_Init(&USART3Handle);
+
+	USART_RxRingBufferInit(&USART3Handle,
+							USART3_RxRingBuffer,
+							sizeof(USART3_RxRingBuffer));
+}
+
+void EX011_USART3_PacketParser(void)
+{
+	uint8_t rx_byte;
+	uint8_t packet_status;
+
+	PacketParser_t parser;
+	DronePacket_t packet;
+
+	SysTick_Init(16000000U);
+
+	USART3_GPIOInits();
+	USART3_Inits();
+
+	PacketParser_Reset(&parser);
+
+	USART3_SendString("USART3 packet parser test started.\r\n");
+	USART3_SendString("Frame: START | LEN | ID | PAYLOAD | CHECKSUM\r\n");
+	USART3_SendString("Example HEX: AA 05 01 48 45 4C 4C 4F EC\r\n");
+
+	USART_PeripheralInterruptControl(USART3,
+									 USART_INTERRUPT_RXNE,
+									 ENABLE);
+
+	USART_PeripheralInterruptControl(USART3,
+									 USART_INTERRUPT_ERR,
+									 ENABLE);
+
+	NVIC_IRQPriorityConfig(IRQ_NO_USART3, 15U);
+	NVIC_IRQInterruptConfig(IRQ_NO_USART3, ENABLE);
+
+	while (1)
+	{
+		/*
+		 * Consume all bytes currently waiting in ring buffer.
+		 * This loop is non-blocking. If there is no data, it exits.
+		 */
+		while (USART_RxReadByte(&USART3Handle, &rx_byte) == USART_STATUS_OK)
+		{
+			packet_status = PacketParser_ProcessByte(&parser,
+													 rx_byte,
+													 &packet);
+
+			if (packet_status == PACKET_STATUS_OK)
+			{
+				g_packet_ok_count++;
+				SendPacketInfo(&packet);
+			}
+			else if (packet_status == PACKET_STATUS_CHECKSUM_ERROR)
+			{
+				g_packet_checksum_error_count++;
+				USART3_SendString("\r\nPACKET ERROR: CHECKSUM\r\n");
+			}
+			else if (packet_status == PACKET_STATUS_LENGTH_ERROR)
+			{
+				g_packet_length_error_count++;
+				USART3_SendString("\r\nPACKET ERROR: LENGTH\r\n");
+			}
+		}
+
+		/*
+		 * Drone firmware would continue other tasks here:
+		 * IMU, PID, motor control, failsafe, telemetry, etc.
+		 */
+	}
+}
+
+void USART_ApplicationEventCallback(USART_Handle_t *pUSARTHandle,
+									uint8_t Event)
+{
+	if (pUSARTHandle->pUSARTx == USART3)
+	{
+		if (Event == USART_EVENT_RX_OVERFLOW)
+		{
+			g_usart3_rx_overflow_count++;
+		}
+		else if ((Event == USART_EVENT_PARITY_ERROR) ||
+				 (Event == USART_EVENT_FRAME_ERROR) ||
+				 (Event == USART_EVENT_NOISE_ERROR) ||
+				 (Event == USART_EVENT_OVERRUN_ERROR))
+		{
+			g_usart3_error_count++;
+		}
+	}
+}
+
+#endif /* ACTIVE_EXAMPLE == EXAMPLE_USART3_PACKET_PARSER */

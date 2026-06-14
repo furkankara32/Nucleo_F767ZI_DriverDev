@@ -1,0 +1,2 @@
+../Examples/Src/ex0001_gpio_led_blink.c:10:13:delay	16	static
+../Examples/Src/ex0001_gpio_led_blink.c:15:6:EX001_GPIO_LedBlink	24	static

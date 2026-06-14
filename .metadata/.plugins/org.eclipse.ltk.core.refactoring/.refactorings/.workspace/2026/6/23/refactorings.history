@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;Nucleo_F767ZI_DriverDev/Core/examples_config.h&apos;" deleteContents="false" description="Delete resource &apos;Nucleo_F767ZI_DriverDev/Core/examples_config.h&apos;" element1="/Nucleo_F767ZI_DriverDev/Core/examples_config.h" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1780522524490"/>
+</session>

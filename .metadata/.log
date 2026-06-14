@@ -1,0 +1,953 @@
+!SESSION 2026-06-03 16:32:54.565 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data D:\Nucleo_F767ZI_DriverDev
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-03 16:33:01.284
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-03 16:33:01.287
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-03 16:33:07.466
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-03 16:36:13.900
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (20 sources, 82 headers) in 11.7 sec: 5,685 declarations; 32,251 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0053%)
+!SESSION 2026-06-03 22:04:37.830 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-03 22:04:50.082
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-03 22:04:50.084
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-03 22:04:58.360
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-03 22:16:48.295
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (20 sources, 82 headers) in 2.49 sec: 5,685 declarations; 32,251 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0053%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-03 22:17:49.505
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (20 sources, 82 headers) in 2.14 sec: 5,685 declarations; 32,251 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0053%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-03 22:18:34.217
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (20 sources, 82 headers) in 1.2 sec: 5,685 declarations; 32,251 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0053%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-03 22:19:13.527
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (20 sources, 82 headers) in 1.36 sec: 5,685 declarations; 32,251 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0053%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-03 22:20:05.443
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (20 sources, 82 headers) in 1.14 sec: 5,685 declarations; 32,251 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0053%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-03 22:20:30.635
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (20 sources, 82 headers) in 1.39 sec: 5,685 declarations; 32,251 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0053%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-03 22:23:16.716
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (20 sources, 82 headers) in 1 sec: 5,685 declarations; 32,251 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0053%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-04 00:32:04.635
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (23 sources, 84 headers) in 1.47 sec: 5,826 declarations; 32,555 references; 0 unresolved inclusions; 1 syntax errors; 230 unresolved names (0.6%)
+
+!ENTRY com.st.stm32cube.ide.mcu.debug.launch 2 0 2026-06-04 00:49:07.800
+!MESSAGE Won't launch debug session since we failed to locate the binary.
+!SESSION 2026-06-04 15:51:35.757 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-04 15:51:46.984
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-04 15:51:46.985
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-04 15:52:02.502
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-04 22:33:39.347 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-04 22:33:51.830
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-04 22:33:51.832
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-04 22:34:05.018
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-06-05 00:45:18.620
+!MESSAGE Indexed 'Nucleo_F767ZI_DriverDev' (11 sources, 86 headers) in 3.37 sec: 4,719 declarations; 9,596 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.014%)
+!SESSION 2026-06-05 15:51:59.941 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-05 15:52:13.384
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-05 15:52:13.386
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-05 15:52:23.074
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-05 20:06:43.615 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-05 20:06:50.875
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-05 20:06:50.877
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-05 20:07:00.717
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.text 4 2 2026-06-05 23:50:05.640
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.text".
+!STACK 0
+java.lang.IllegalStateException: startLine (251) does not match endLine (252)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toClosestImageLine(ProjectionMapping.java:472)
+	at org.eclipse.jface.text.TextViewer.getClosestWidgetLineForModelLine(TextViewer.java:5411)
+	at org.eclipse.jface.text.TextViewer$ViewerState.updateViewport(TextViewer.java:1210)
+	at org.eclipse.jface.text.TextViewer$ViewerState.restore(TextViewer.java:1190)
+	at org.eclipse.jface.text.TextViewer.enabledRedrawing(TextViewer.java:5037)
+	at org.eclipse.jface.text.TextViewer.enabledRedrawing(TextViewer.java:5012)
+	at org.eclipse.jface.text.TextViewer.setRedraw(TextViewer.java:5094)
+	at org.eclipse.jface.text.TextViewer.setRedraw(TextViewer.java:5068)
+	at org.eclipse.jface.text.TextViewer$RewriteTarget.setRedraw(TextViewer.java:1017)
+	at org.eclipse.jface.text.TextViewer$DocumentRewriteSessionListener.documentRewriteSessionChanged(TextViewer.java:1423)
+	at org.eclipse.jface.text.AbstractDocument.fireRewriteSessionChanged(AbstractDocument.java:1423)
+	at org.eclipse.jface.text.AbstractDocument.stopRewriteSession(AbstractDocument.java:1504)
+	at org.eclipse.core.internal.filebuffers.SynchronizableDocument.stopRewriteSession(SynchronizableDocument.java:108)
+	at org.eclipse.cdt.ui.text.doctools.DefaultMultilineCommentAutoEditStrategy.customizeDocumentCommand(DefaultMultilineCommentAutoEditStrategy.java:143)
+	at org.eclipse.jface.text.TextViewer.customizeDocumentCommand(TextViewer.java:3708)
+	at org.eclipse.jface.text.TextViewer.handleVerifyEvent(TextViewer.java:3750)
+	at org.eclipse.jface.text.source.projection.ProjectionViewer.handleVerifyEvent(ProjectionViewer.java:1250)
+	at org.eclipse.jface.text.TextViewer$TextVerifyListener.verifyText(TextViewer.java:428)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:290)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Widget.notifyListeners(Widget.java:853)
+	at org.eclipse.swt.custom.StyledText.modifyContent(StyledText.java:7099)
+	at org.eclipse.swt.custom.StyledText.sendKeyEvent(StyledText.java:8031)
+	at org.eclipse.swt.custom.StyledText.doContent(StyledText.java:2030)
+	at org.eclipse.swt.custom.StyledText.handleKey(StyledText.java:5714)
+	at org.eclipse.swt.custom.StyledText.handleKeyDown(StyledText.java:5745)
+	at org.eclipse.swt.custom.StyledText.lambda$28(StyledText.java:5424)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Widget.sendKeyEvent(Widget.java:1225)
+	at org.eclipse.swt.widgets.Widget.sendKeyEvent(Widget.java:1221)
+	at org.eclipse.swt.widgets.Widget.wmChar(Widget.java:1704)
+	at org.eclipse.swt.widgets.Control.WM_CHAR(Control.java:4849)
+	at org.eclipse.swt.widgets.Canvas.WM_CHAR(Canvas.java:347)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4727)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:05.645
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.ArrayIndexOutOfBoundsException: Index 14 out of bounds for length 4
+	at org.eclipse.jface.text.rules.FastPartitioner.documentChanged2(FastPartitioner.java:310)
+	at org.eclipse.jface.text.AbstractDocument.updateDocumentStructures(AbstractDocument.java:667)
+	at org.eclipse.jface.text.AbstractDocument.fireDocumentChanged(AbstractDocument.java:763)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1091)
+	at org.eclipse.core.internal.filebuffers.SynchronizableDocument.replace(SynchronizableDocument.java:176)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1109)
+	at org.eclipse.core.internal.filebuffers.SynchronizableDocument.replace(SynchronizableDocument.java:164)
+	at org.eclipse.cdt.ui.text.doctools.DefaultMultilineCommentAutoEditStrategy.customizeDocumentAfterNewLine(DefaultMultilineCommentAutoEditStrategy.java:208)
+	at org.eclipse.cdt.ui.text.doctools.DefaultMultilineCommentAutoEditStrategy.customizeDocumentCommand(DefaultMultilineCommentAutoEditStrategy.java:138)
+	at org.eclipse.jface.text.TextViewer.customizeDocumentCommand(TextViewer.java:3708)
+	at org.eclipse.jface.text.TextViewer.handleVerifyEvent(TextViewer.java:3750)
+	at org.eclipse.jface.text.source.projection.ProjectionViewer.handleVerifyEvent(ProjectionViewer.java:1250)
+	at org.eclipse.jface.text.TextViewer$TextVerifyListener.verifyText(TextViewer.java:428)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:290)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Widget.notifyListeners(Widget.java:853)
+	at org.eclipse.swt.custom.StyledText.modifyContent(StyledText.java:7099)
+	at org.eclipse.swt.custom.StyledText.sendKeyEvent(StyledText.java:8031)
+	at org.eclipse.swt.custom.StyledText.doContent(StyledText.java:2030)
+	at org.eclipse.swt.custom.StyledText.handleKey(StyledText.java:5714)
+	at org.eclipse.swt.custom.StyledText.handleKeyDown(StyledText.java:5745)
+	at org.eclipse.swt.custom.StyledText.lambda$28(StyledText.java:5424)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Widget.sendKeyEvent(Widget.java:1225)
+	at org.eclipse.swt.widgets.Widget.sendKeyEvent(Widget.java:1221)
+	at org.eclipse.swt.widgets.Widget.wmChar(Widget.java:1704)
+	at org.eclipse.swt.widgets.Control.WM_CHAR(Control.java:4849)
+	at org.eclipse.swt.widgets.Canvas.WM_CHAR(Canvas.java:347)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4727)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.text 4 2 2026-06-05 23:50:05.646
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.text".
+!STACK 0
+org.eclipse.core.runtime.AssertionFailedException: assertion failed: 
+	at org.eclipse.core.runtime.Assert.isTrue(Assert.java:119)
+	at org.eclipse.core.runtime.Assert.isTrue(Assert.java:104)
+	at org.eclipse.ui.internal.texteditor.quickdiff.DocumentLineDiffer.handleAboutToBeChanged(DocumentLineDiffer.java:819)
+	at org.eclipse.ui.internal.texteditor.quickdiff.DocumentLineDiffer.documentAboutToBeChanged(DocumentLineDiffer.java:788)
+	at org.eclipse.jface.text.AbstractDocument.fireDocumentAboutToBeChanged(AbstractDocument.java:636)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1082)
+	at org.eclipse.core.internal.filebuffers.SynchronizableDocument.replace(SynchronizableDocument.java:176)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1109)
+	at org.eclipse.core.internal.filebuffers.SynchronizableDocument.replace(SynchronizableDocument.java:164)
+	at org.eclipse.jface.text.projection.ProjectionTextStore.replace(ProjectionTextStore.java:102)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1084)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1109)
+	at org.eclipse.jface.text.projection.ProjectionDocument.replace(ProjectionDocument.java:627)
+	at org.eclipse.jface.text.DefaultDocumentAdapter.replaceTextRange(DefaultDocumentAdapter.java:223)
+	at org.eclipse.swt.custom.StyledText.modifyContent(StyledText.java:7131)
+	at org.eclipse.swt.custom.StyledText.sendKeyEvent(StyledText.java:8031)
+	at org.eclipse.swt.custom.StyledText.doContent(StyledText.java:2030)
+	at org.eclipse.swt.custom.StyledText.handleKey(StyledText.java:5714)
+	at org.eclipse.swt.custom.StyledText.handleKeyDown(StyledText.java:5745)
+	at org.eclipse.swt.custom.StyledText.lambda$28(StyledText.java:5424)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Widget.sendKeyEvent(Widget.java:1225)
+	at org.eclipse.swt.widgets.Widget.sendKeyEvent(Widget.java:1221)
+	at org.eclipse.swt.widgets.Widget.wmChar(Widget.java:1704)
+	at org.eclipse.swt.widgets.Control.WM_CHAR(Control.java:4849)
+	at org.eclipse.swt.widgets.Canvas.WM_CHAR(Canvas.java:347)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4727)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.text 4 2 2026-06-05 23:50:05.648
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.text".
+!STACK 0
+org.eclipse.core.runtime.AssertionFailedException: assertion failed: 
+	at org.eclipse.core.runtime.Assert.isTrue(Assert.java:119)
+	at org.eclipse.core.runtime.Assert.isTrue(Assert.java:104)
+	at org.eclipse.ui.internal.texteditor.quickdiff.compare.equivalence.DocEquivalenceComparator.<init>(DocEquivalenceComparator.java:52)
+	at org.eclipse.ui.internal.texteditor.quickdiff.DocumentLineDiffer.handleChanged(DocumentLineDiffer.java:1014)
+	at org.eclipse.ui.internal.texteditor.quickdiff.DocumentLineDiffer.documentChanged(DocumentLineDiffer.java:861)
+	at org.eclipse.jface.text.AbstractDocument.doFireDocumentChanged2(AbstractDocument.java:739)
+	at org.eclipse.jface.text.AbstractDocument.doFireDocumentChanged(AbstractDocument.java:708)
+	at org.eclipse.jface.text.AbstractDocument.doFireDocumentChanged(AbstractDocument.java:692)
+	at org.eclipse.jface.text.AbstractDocument.fireDocumentChanged(AbstractDocument.java:766)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1091)
+	at org.eclipse.core.internal.filebuffers.SynchronizableDocument.replace(SynchronizableDocument.java:176)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1109)
+	at org.eclipse.core.internal.filebuffers.SynchronizableDocument.replace(SynchronizableDocument.java:164)
+	at org.eclipse.jface.text.projection.ProjectionTextStore.replace(ProjectionTextStore.java:102)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1084)
+	at org.eclipse.jface.text.AbstractDocument.replace(AbstractDocument.java:1109)
+	at org.eclipse.jface.text.projection.ProjectionDocument.replace(ProjectionDocument.java:627)
+	at org.eclipse.jface.text.DefaultDocumentAdapter.replaceTextRange(DefaultDocumentAdapter.java:223)
+	at org.eclipse.swt.custom.StyledText.modifyContent(StyledText.java:7131)
+	at org.eclipse.swt.custom.StyledText.sendKeyEvent(StyledText.java:8031)
+	at org.eclipse.swt.custom.StyledText.doContent(StyledText.java:2030)
+	at org.eclipse.swt.custom.StyledText.handleKey(StyledText.java:5714)
+	at org.eclipse.swt.custom.StyledText.handleKeyDown(StyledText.java:5745)
+	at org.eclipse.swt.custom.StyledText.lambda$28(StyledText.java:5424)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Widget.sendKeyEvent(Widget.java:1225)
+	at org.eclipse.swt.widgets.Widget.sendKeyEvent(Widget.java:1221)
+	at org.eclipse.swt.widgets.Widget.wmChar(Widget.java:1704)
+	at org.eclipse.swt.widgets.Control.WM_CHAR(Control.java:4849)
+	at org.eclipse.swt.widgets.Canvas.WM_CHAR(Canvas.java:347)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4727)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:14.358
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.lambda$2(LineNumberRulerColumn.java:610)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:247)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Composite.WM_PAINT(Composite.java:1636)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4784)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:20.255
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.lambda$2(LineNumberRulerColumn.java:610)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:247)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Composite.WM_PAINT(Composite.java:1636)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4784)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:26.029
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.lambda$2(LineNumberRulerColumn.java:610)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:247)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Composite.WM_PAINT(Composite.java:1636)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4784)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:28.262
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.lambda$2(LineNumberRulerColumn.java:610)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:247)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Composite.WM_PAINT(Composite.java:1636)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4784)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:31.483
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.lambda$2(LineNumberRulerColumn.java:610)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:247)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Composite.WM_PAINT(Composite.java:1636)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4784)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:49.489
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.lambda$2(LineNumberRulerColumn.java:610)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:247)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Composite.WM_PAINT(Composite.java:1636)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4784)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:54.528
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.lambda$2(LineNumberRulerColumn.java:610)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:247)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:91)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4326)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1174)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1198)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1183)
+	at org.eclipse.swt.widgets.Composite.WM_PAINT(Composite.java:1636)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4784)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:342)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5091)
+	at org.eclipse.swt.internal.win32.OS.DispatchMessage(Native Method)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3710)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:54.531
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.redraw(LineNumberRulerColumn.java:960)
+	at org.eclipse.jface.internal.text.source.DiffPainter.redraw(DiffPainter.java:374)
+	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:40)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:132)
+	at org.eclipse.swt.widgets.Display.runAsyncMessages(Display.java:4099)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3715)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:54.533
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.redraw(LineNumberRulerColumn.java:960)
+	at org.eclipse.jface.internal.text.source.DiffPainter.redraw(DiffPainter.java:374)
+	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:40)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:132)
+	at org.eclipse.swt.widgets.Display.runAsyncMessages(Display.java:4099)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3715)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+
+!ENTRY org.eclipse.ui 4 0 2026-06-05 23:50:55.104
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.IllegalStateException: startLine (252) does not match endLine (253)
+	at org.eclipse.jface.text.projection.ProjectionMapping.toImageLine(ProjectionMapping.java:463)
+	at org.eclipse.jface.text.TextViewer.modelLine2WidgetLine(TextViewer.java:5213)
+	at org.eclipse.jface.text.JFaceTextUtil.modelLineToWidgetLine(JFaceTextUtil.java:250)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.doubleBufferPaint(LineNumberRulerColumn.java:694)
+	at org.eclipse.jface.text.source.LineNumberRulerColumn.redraw(LineNumberRulerColumn.java:960)
+	at org.eclipse.jface.internal.text.source.DiffPainter.redraw(DiffPainter.java:374)
+	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:40)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:132)
+	at org.eclipse.swt.widgets.Display.runAsyncMessages(Display.java:4099)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3715)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$5.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1042)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:153)
+	at org.eclipse.ui.internal.Workbench.lambda$3(Workbench.java:639)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:339)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:546)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:173)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:152)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:208)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:143)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:109)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:439)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:271)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:668)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:605)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1481)
+!SESSION 2026-06-06 12:12:15.261 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-06 12:12:27.745
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-06 12:12:27.748
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-06 12:12:36.769
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-06 20:47:05.920 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-06 20:47:27.014
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-06 20:47:27.015
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-06 20:47:38.240
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-06 23:08:31.997 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-06 23:08:45.955
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-06 23:08:45.958
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-06 23:08:56.487
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-07 20:53:40.403 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-07 20:53:56.381
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-07 20:53:56.383
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-07 20:54:11.778
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-08 12:04:19.103 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-08 12:04:44.561
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-08 12:04:44.564
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-08 12:05:02.211
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-09 05:34:04.780 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data D:\Nucleo_F767ZI_DriverDev
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-09 05:34:11.127
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-09 05:34:11.128
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-09 05:34:20.873
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-10 11:55:11.793 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-10 11:55:26.332
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-10 11:55:26.335
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-10 11:55:38.233
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-10 21:19:31.306 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-10 21:27:05.914
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-10 21:27:05.916
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-10 21:27:17.392
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-11 15:09:47.416 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-11 15:10:03.811
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-11 15:10:03.813
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-11 15:10:12.746
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-12 14:00:43.110 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.core.resources 2 10035 2026-06-12 14:00:51.289
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-12 14:00:57.288
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-12 14:00:57.290
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-12 14:01:08.397
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-13 13:20:57.334 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-13 13:21:08.176
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-13 13:21:08.176
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-13 13:21:15.597
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2026-06-14 10:51:00.454 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=tr_TR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-06-14 10:51:16.492
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-06-14 10:51:16.495
+!MESSAGE Log4j2 initialized with config file D:\Nucleo_F767ZI_DriverDev\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-06-14 10:51:31.685
+!MESSAGE Started RMI Server, listening on port 41337

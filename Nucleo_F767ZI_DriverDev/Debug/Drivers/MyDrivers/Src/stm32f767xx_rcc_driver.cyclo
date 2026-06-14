@@ -1,0 +1,5 @@
+../Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.c:47:17:RCC_GetPLLClockValue	3
+../Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.c:100:10:RCC_GetSYSCLKValue	4
+../Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.c:133:10:RCC_GetHCLKValue	1
+../Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.c:148:10:RCC_GetPCLK1Value	1
+../Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.c:163:10:RCC_GetPCLK2Value	1

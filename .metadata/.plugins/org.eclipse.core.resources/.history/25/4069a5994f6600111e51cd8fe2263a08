@@ -1,0 +1,13 @@
+/*
+ * stm32f767xx_i2c_driver.h
+ *
+ *  Created on: Jun 12, 2026
+ *      Author: furkan
+ */
+
+#ifndef MYDRIVERS_INC_STM32F767XX_I2C_DRIVER_H_
+#define MYDRIVERS_INC_STM32F767XX_I2C_DRIVER_H_
+
+
+
+#endif /* MYDRIVERS_INC_STM32F767XX_I2C_DRIVER_H_ */

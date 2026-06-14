@@ -1,0 +1,52 @@
+/*
+ * stm32f767xx_i2c_driver.c
+ *
+ *  Created on: Jun 12, 2026
+ *      Author: furkan
+ */
+
+#include "stm32f767xx_i2c_driver.h"
+
+void I2C_PeriClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
+{
+    if (EnorDi == ENABLE)
+    {
+        if (pI2Cx == I2C1)
+        {
+            I2C1_PCLK_EN();
+        }
+        else if (pI2Cx == I2C2)
+        {
+            I2C2_PCLK_EN();
+        }
+        else if (pI2Cx == I2C3)
+        {
+            I2C3_PCLK_EN();
+        }
+        else if (pI2Cx == I2C4)
+        {
+            I2C4_PCLK_EN();
+        }
+    }
+    else
+    {
+        if (pI2Cx == I2C1)
+        {
+            I2C1_PCLK_DI();
+        }
+        else if (pI2Cx == I2C2)
+        {
+            I2C2_PCLK_DI();
+        }
+        else if (pI2Cx == I2C3)
+        {
+            I2C3_PCLK_DI();
+        }
+        else if (pI2Cx == I2C4)
+        {
+            I2C4_PCLK_DI();
+        }
+    }
+}
+
+

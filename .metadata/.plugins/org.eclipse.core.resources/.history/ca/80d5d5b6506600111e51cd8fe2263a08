@@ -1,0 +1,25 @@
+/*
+ * examples.h
+ *
+ *  Created on: Jun 4, 2026
+ *      Author: furkan
+ */
+
+#ifndef INC_EXAMPLES_H_
+#define INC_EXAMPLES_H_
+
+void EX001_GPIO_LedBlink(void);
+void EX002_GPIO_LedSetReset(void);
+void EX003_GPIO_ButtonInput(void);
+void EX004_GPIO_DeInitTest(void);
+void EX005_GPIO_ButtonInterrupt(void);
+void EX006_SysTickLedBlink(void);
+void EX007_USART3_Tx(void);
+void EX008_USART3_RxEcho(void);
+void EX009_USART3_InterruptRxEcho(void);
+void EX010_USART3_Packet10Byte(void);
+void EX011_USART3_PacketParser(void);
+void EX012_SPI1_Loopback(void);
+void EX013_SPI1_Loopback_WithCS(void);
+void EX014_SPI1_SendReceive_Test(void);
+#endif /* INC_EXAMPLES_H_ */
