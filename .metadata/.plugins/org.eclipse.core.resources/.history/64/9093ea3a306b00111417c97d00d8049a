@@ -1,0 +1,1259 @@
+/*
+ * stm32f767xx_i2c_driver.c
+ *
+ *  Created on: Jun 12, 2026
+ *      Author: furkan
+ */
+
+#include "stm32f767xx_i2c_driver.h"
+#include "stm32f767xx_systick_driver.h"
+
+static I2C_Handle_t *s_I2C1Handle = 0;
+static I2C_Handle_t *s_I2C2Handle = 0;
+static I2C_Handle_t *s_I2C3Handle = 0;
+static I2C_Handle_t *s_I2C4Handle = 0;
+
+static void I2C_RegisterHandle(I2C_Handle_t *pI2CHandle)
+{
+    if (pI2CHandle->pI2Cx == I2C1)
+    {
+        s_I2C1Handle = pI2CHandle;
+    }
+    else if (pI2CHandle->pI2Cx == I2C2)
+    {
+        s_I2C2Handle = pI2CHandle;
+    }
+    else if (pI2CHandle->pI2Cx == I2C3)
+    {
+        s_I2C3Handle = pI2CHandle;
+    }
+    else if (pI2CHandle->pI2Cx == I2C4)
+    {
+        s_I2C4Handle = pI2CHandle;
+    }
+}
+
+static I2C_Handle_t *I2C_GetHandleFromInstance(I2C_RegDef_t *pI2Cx)
+{
+    if (pI2Cx == I2C1)
+    {
+        return s_I2C1Handle;
+    }
+    else if (pI2Cx == I2C2)
+    {
+        return s_I2C2Handle;
+    }
+    else if (pI2Cx == I2C3)
+    {
+        return s_I2C3Handle;
+    }
+    else if (pI2Cx == I2C4)
+    {
+        return s_I2C4Handle;
+    }
+
+    return 0;
+}
+static uint32_t I2C_PrepareCR2(uint16_t SlaveAddr, uint8_t AddressMode,uint8_t Direction, uint32_t Len, uint8_t Sr)
+{
+    uint32_t cr2 = 0U;
+
+    /*
+     * First IT version:
+     * Len must be <= 255.
+     * NBYTES field is 8-bit.
+     */
+    if (AddressMode == I2C_ADDR_MODE_7BIT)
+    {
+        cr2 |= (((uint32_t)SlaveAddr & 0x7FU) << 1U);
+    }
+    else
+    {
+        /*
+         * 10-bit address will be added later.
+         */
+        return 0U;
+    }
+
+    if (Direction == I2C_TRANSFER_READ)
+    {
+        cr2 |= (1U << I2C_CR2_RD_WRN);
+    }
+
+    cr2 |= ((Len & 0xFFU) << I2C_CR2_NBYTES);
+
+    /*
+     * Sr disabled -> AUTOEND enabled.
+     * Sr enabled  -> no AUTOEND, TC event will finish the phase.
+     */
+    if (Sr == I2C_DISABLE_SR)
+    {
+        cr2 |= (1U << I2C_CR2_AUTOEND);
+    }
+
+    return cr2;
+}
+static uint8_t I2C_WaitOnFlagUntilTimeout(I2C_RegDef_t *pI2Cx,uint32_t FlagName,uint8_t DesiredStatus,uint32_t TimeoutMs,uint8_t TimeoutStatus)
+{
+    uint32_t start_tick = millis();
+    uint8_t error_status;
+
+    while (I2C_GetFlagStatus(pI2Cx, FlagName) != DesiredStatus)
+    {
+        /*
+         * NACK received.
+         * This usually means there is no slave device at this address,
+         * or the slave rejected the transfer.
+         */
+        if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_NACKF) == SET)
+        {
+            I2C_ClearNACKFlag(pI2Cx);
+
+            if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+            {
+                I2C_ClearSTOPFlag(pI2Cx);
+            }
+
+            return I2C_STATUS_NACK;
+        }
+
+        /*
+         * Check real bus errors.
+         */
+        error_status = I2C_GetErrorStatus(pI2Cx);
+
+        if (error_status & (I2C_ERROR_BERR |
+                            I2C_ERROR_ARLO |
+                            I2C_ERROR_OVR  |
+                            I2C_ERROR_TIMEOUT))
+        {
+            I2C_ClearErrorFlags(pI2Cx);
+
+            if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+            {
+                I2C_ClearSTOPFlag(pI2Cx);
+            }
+
+            return I2C_STATUS_ERROR;
+        }
+
+        if ((millis() - start_tick) >= TimeoutMs)
+        {
+            return TimeoutStatus;
+        }
+    }
+
+    return I2C_STATUS_OK;
+}
+
+void I2C_PeriClockControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
+{
+    if (EnorDi == ENABLE)
+    {
+        if (pI2Cx == I2C1)
+        {
+            I2C1_PCLK_EN();
+        }
+        else if (pI2Cx == I2C2)
+        {
+            I2C2_PCLK_EN();
+        }
+        else if (pI2Cx == I2C3)
+        {
+            I2C3_PCLK_EN();
+        }
+        else if (pI2Cx == I2C4)
+        {
+            I2C4_PCLK_EN();
+        }
+    }
+    else
+    {
+        if (pI2Cx == I2C1)
+        {
+            I2C1_PCLK_DI();
+        }
+        else if (pI2Cx == I2C2)
+        {
+            I2C2_PCLK_DI();
+        }
+        else if (pI2Cx == I2C3)
+        {
+            I2C3_PCLK_DI();
+        }
+        else if (pI2Cx == I2C4)
+        {
+            I2C4_PCLK_DI();
+        }
+    }
+}
+
+
+uint8_t I2C_Init(I2C_Handle_t *pI2CHandle)
+{
+    uint32_t tempreg = 0U;
+
+    if ((pI2CHandle == 0) || (pI2CHandle->pI2Cx == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if (pI2CHandle->I2C_Config.I2C_Timing == 0U)
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if (pI2CHandle->I2C_Config.I2C_DigitalFilter > 15U)
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    /*
+     * 1. Enable peripheral clock.
+     */
+    I2C_PeriClockControl(pI2CHandle->pI2Cx, ENABLE);
+
+    /*
+     * 2. Disable I2C before configuration.
+     * TIMINGR and filter settings must be configured while PE = 0.
+     */
+    I2C_PeripheralControl(pI2CHandle->pI2Cx, DISABLE);
+
+    /*
+     * 3. Clear CR1 configuration area.
+     */
+    tempreg = 0U;
+
+    /*
+     * Analog filter.
+     * ANFOFF = 0 -> enabled
+     * ANFOFF = 1 -> disabled
+     */
+    if (pI2CHandle->I2C_Config.I2C_AnalogFilter == I2C_ANALOG_FILTER_DISABLE)
+    {
+        tempreg |= (1U << I2C_CR1_ANFOFF);
+    }
+
+    /*
+     * Digital filter.
+     * DNF[3:0] is CR1[11:8].
+     */
+    tempreg |= ((uint32_t)(pI2CHandle->I2C_Config.I2C_DigitalFilter & 0x0FU) << I2C_CR1_DNF);
+
+    /*
+     * Clock stretching.
+     * NOSTRETCH = 0 -> enabled
+     * NOSTRETCH = 1 -> disabled
+     */
+    if (pI2CHandle->I2C_Config.I2C_ClockStretch == I2C_CLOCK_STRETCH_DISABLE)
+    {
+        tempreg |= (1U << I2C_CR1_NOSTRETCH);
+    }
+
+    /*
+     * Write CR1 while PE = 0.
+     */
+    pI2CHandle->pI2Cx->I2C_CR1 = tempreg;
+
+    /*
+     * 4. Configure timing.
+     */
+    pI2CHandle->pI2Cx->I2C_TIMINGR = pI2CHandle->I2C_Config.I2C_Timing;
+
+    /*
+     * 5. Clear possible pending flags.
+     */
+    I2C_ClearErrorFlags(pI2CHandle->pI2Cx);
+    I2C_ClearSTOPFlag(pI2CHandle->pI2Cx);
+    I2C_ClearNACKFlag(pI2CHandle->pI2Cx);
+
+    /*
+     * 6. Enable peripheral.
+     */
+    I2C_PeripheralControl(pI2CHandle->pI2Cx, ENABLE);
+
+    /*
+     * Initialize non-blocking transfer state.
+     */
+    pI2CHandle->pTxBuffer = 0;
+    pI2CHandle->pRxBuffer = 0;
+    pI2CHandle->TxLen = 0U;
+    pI2CHandle->RxLen = 0U;
+    pI2CHandle->DevAddr = 0U;
+    pI2CHandle->AddressMode = I2C_ADDR_MODE_7BIT;
+    pI2CHandle->Sr = I2C_DISABLE_SR;
+    pI2CHandle->TxRxState = I2C_READY;
+    pI2CHandle->XferMode = I2C_XFER_MODE_NONE;
+    pI2CHandle->ErrorCode = I2C_ERROR_NONE;
+
+
+    I2C_RegisterHandle(pI2CHandle);
+
+    return I2C_STATUS_OK;
+}
+
+
+void I2C_DeInit(I2C_RegDef_t *pI2Cx)
+{
+    if (pI2Cx == I2C1)
+    {
+        I2C1_REG_RESET();
+    }
+    else if (pI2Cx == I2C2)
+    {
+        I2C2_REG_RESET();
+    }
+    else if (pI2Cx == I2C3)
+    {
+        I2C3_REG_RESET();
+    }
+    else if (pI2Cx == I2C4)
+    {
+        I2C4_REG_RESET();
+    }
+}
+
+
+void I2C_PeripheralControl(I2C_RegDef_t *pI2Cx, uint8_t EnorDi)
+{
+    if (EnorDi == ENABLE)
+    {
+        pI2Cx->I2C_CR1 |= (1U << I2C_CR1_PE);
+    }
+    else
+    {
+        pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_PE);
+    }
+}
+
+
+uint8_t I2C_GetFlagStatus(I2C_RegDef_t *pI2Cx, uint32_t FlagName)
+{
+    if (pI2Cx->I2C_ISR & FlagName)
+    {
+        return SET;
+    }
+
+    return RESET;
+}
+
+
+uint8_t I2C_GetErrorStatus(I2C_RegDef_t *pI2Cx)
+{
+    uint8_t error_status = I2C_ERROR_NONE;
+
+    if (pI2Cx == 0)
+    {
+        return I2C_ERROR_NONE;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_BERR)
+    {
+        error_status |= I2C_ERROR_BERR;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_ARLO)
+    {
+        error_status |= I2C_ERROR_ARLO;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_OVR)
+    {
+        error_status |= I2C_ERROR_OVR;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_TIMEOUT)
+    {
+        error_status |= I2C_ERROR_TIMEOUT;
+    }
+
+    if (pI2Cx->I2C_ISR & I2C_FLAG_NACKF)
+    {
+        error_status |= I2C_ERROR_NACK;
+    }
+
+    return error_status;
+}
+
+
+void I2C_ClearErrorFlags(I2C_RegDef_t *pI2Cx)
+{
+    if (pI2Cx == 0)
+    {
+        return;
+    }
+
+    /*
+     * ICR register clears flags by writing 1 to corresponding clear bits.
+     */
+    pI2Cx->I2C_ICR = ((1U << I2C_ICR_BERRCF)   |
+                      (1U << I2C_ICR_ARLOCF)   |
+                      (1U << I2C_ICR_OVRCF)    |
+                      (1U << I2C_ICR_TIMOUTCF));
+}
+
+
+void I2C_ClearSTOPFlag(I2C_RegDef_t *pI2Cx)
+{
+    if (pI2Cx == 0)
+    {
+        return;
+    }
+
+    pI2Cx->I2C_ICR = (1U << I2C_ICR_STOPCF);
+}
+
+
+void I2C_ClearNACKFlag(I2C_RegDef_t *pI2Cx)
+{
+    if (pI2Cx == 0)
+    {
+        return;
+    }
+
+    pI2Cx->I2C_ICR = (1U << I2C_ICR_NACKCF);
+}
+uint8_t I2C_IsDeviceReadyWithTimeout(I2C_Handle_t *pI2CHandle,uint16_t SlaveAddr,uint8_t AddressMode,uint32_t TimeoutMs)
+{
+    uint8_t status;
+    uint8_t error_status;
+    uint32_t start_tick;
+    I2C_RegDef_t *pI2Cx;
+    uint32_t cr2 = 0U;
+
+    if ((pI2CHandle == 0) || (pI2CHandle->pI2Cx == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2Cx = pI2CHandle->pI2Cx;
+
+    status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                        I2C_FLAG_BUSY,
+                                        RESET,
+                                        TimeoutMs,
+                                        I2C_STATUS_BUSY_TIMEOUT);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    if (AddressMode == I2C_ADDR_MODE_7BIT)
+    {
+        if (SlaveAddr > 0x7FU)
+        {
+            return I2C_STATUS_ERROR;
+        }
+
+        cr2 |= (((uint32_t)SlaveAddr & 0x7FU) << 1U);
+    }
+    else if (AddressMode == I2C_ADDR_MODE_10BIT)
+    {
+        if (SlaveAddr > 0x3FFU)
+        {
+            return I2C_STATUS_ERROR;
+        }
+
+        cr2 |= ((uint32_t)SlaveAddr & 0x3FFU);
+        cr2 |= (1U << I2C_CR2_ADD10);
+    }
+    else
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    /*
+     * Address-only probe:
+     * Write direction, NBYTES = 0, AUTOEND = 1.
+     */
+    cr2 &= ~(1U << I2C_CR2_RD_WRN);
+    cr2 |= (1U << I2C_CR2_AUTOEND);
+
+    I2C_ClearNACKFlag(pI2Cx);
+    I2C_ClearSTOPFlag(pI2Cx);
+    I2C_ClearErrorFlags(pI2Cx);
+
+    pI2Cx->I2C_CR2 = cr2;
+    pI2Cx->I2C_CR2 |= (1U << I2C_CR2_START);
+
+    start_tick = millis();
+
+    while (1)
+    {
+    	if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_NACKF) == SET)
+    	{
+    	    I2C_ClearNACKFlag(pI2Cx);
+
+    	    /*
+    	     * AUTOEND = 1 olduğu için NACK sonrası STOP oluşur.
+    	     * STOPF hemen aynı anda set olmayabilir.
+    	     * Bu yüzden STOPF beklenip temizlenmeden fonksiyondan çıkmıyoruz.
+    	     */
+    	    status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+    	                                        I2C_FLAG_STOPF,
+    	                                        SET,
+    	                                        TimeoutMs,
+    	                                        I2C_STATUS_STOP_TIMEOUT);
+
+    	    if (status == I2C_STATUS_OK)
+    	    {
+    	        I2C_ClearSTOPFlag(pI2Cx);
+    	    }
+
+    	    return I2C_STATUS_NACK;
+    	}
+
+        if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+        {
+            I2C_ClearSTOPFlag(pI2Cx);
+            return I2C_STATUS_OK;
+        }
+
+        error_status = I2C_GetErrorStatus(pI2Cx);
+
+        if (error_status & (I2C_ERROR_BERR |
+                            I2C_ERROR_ARLO |
+                            I2C_ERROR_OVR  |
+                            I2C_ERROR_TIMEOUT))
+        {
+            I2C_ClearErrorFlags(pI2Cx);
+
+            if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+            {
+                I2C_ClearSTOPFlag(pI2Cx);
+            }
+
+            return I2C_STATUS_ERROR;
+        }
+
+        if ((millis() - start_tick) >= TimeoutMs)
+        {
+            return I2C_STATUS_TIMEOUT;
+        }
+    }
+}
+void I2C_CloseSendData(I2C_Handle_t *pI2CHandle)
+{
+    if (pI2CHandle == 0)
+    {
+        return;
+    }
+
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_TXIE);
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_TCIE);
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_STOPIE);
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_NACKIE);
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_ERRIE);
+
+    pI2CHandle->pTxBuffer = 0;
+    pI2CHandle->TxLen = 0U;
+    pI2CHandle->TxRxState = I2C_READY;
+    pI2CHandle->XferMode = I2C_XFER_MODE_NONE;
+}
+
+void I2C_CloseReceiveData(I2C_Handle_t *pI2CHandle)
+{
+    if (pI2CHandle == 0)
+    {
+        return;
+    }
+
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_RXIE);
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_TCIE);
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_STOPIE);
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_NACKIE);
+    pI2CHandle->pI2Cx->I2C_CR1 &= ~(1U << I2C_CR1_ERRIE);
+
+    pI2CHandle->pRxBuffer = 0;
+    pI2CHandle->RxLen = 0U;
+    pI2CHandle->TxRxState = I2C_READY;
+    pI2CHandle->XferMode = I2C_XFER_MODE_NONE;
+}
+uint8_t I2C_MasterTransmitWithTimeout(I2C_Handle_t *pI2CHandle,uint8_t *pTxBuffer,uint32_t Len,uint16_t SlaveAddr,uint8_t AddressMode,uint8_t Sr, uint32_t TimeoutMs)
+{
+    uint8_t status;
+    I2C_RegDef_t *pI2Cx;
+    uint32_t cr2 = 0U;
+
+    if ((pI2CHandle == 0) || (pI2CHandle->pI2Cx == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if ((Len > 0U) && (pTxBuffer == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if (Len > 255U)
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2Cx = pI2CHandle->pI2Cx;
+
+    /*
+     * Normal transfer ise BUSY = 0 bekle.
+     * Eğer daha önce AUTOEND=0 ile TC oluşmuşsa, repeated START için BUSY zaten 1 olabilir.
+     */
+    if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_TC) != SET)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_BUSY,
+                                            RESET,
+                                            TimeoutMs,
+                                            I2C_STATUS_BUSY_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+    }
+
+    /*
+     * Configure CR2 for master write.
+     */
+    if (AddressMode == I2C_ADDR_MODE_7BIT)
+    {
+        if (SlaveAddr > 0x7FU)
+        {
+            return I2C_STATUS_ERROR;
+        }
+
+        cr2 |= (((uint32_t)SlaveAddr & 0x7FU) << 1U);
+    }
+    else if (AddressMode == I2C_ADDR_MODE_10BIT)
+    {
+        if (SlaveAddr > 0x3FFU)
+        {
+            return I2C_STATUS_ERROR;
+        }
+
+        cr2 |= ((uint32_t)SlaveAddr & 0x3FFU);
+        cr2 |= (1U << I2C_CR2_ADD10);
+    }
+    else
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    /*
+     * Write direction: RD_WRN = 0.
+     */
+    cr2 &= ~(1U << I2C_CR2_RD_WRN);
+
+    /*
+     * NBYTES.
+     */
+    cr2 |= ((uint32_t)Len << I2C_CR2_NBYTES);
+
+    /*
+     * Sr kontrolü:
+     *
+     * I2C_DISABLE_SR -> STOP istenir, AUTOEND = 1.
+     * I2C_ENABLE_SR  -> STOP yok, AUTOEND = 0, TC beklenir.
+     */
+    if (Sr == I2C_DISABLE_SR)
+    {
+        cr2 |= (1U << I2C_CR2_AUTOEND);
+    }
+    else if (Sr == I2C_ENABLE_SR)
+    {
+        cr2 &= ~(1U << I2C_CR2_AUTOEND);
+    }
+    else
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    /*
+     * Write CR2 before START.
+     */
+    pI2Cx->I2C_CR2 = cr2;
+
+    /*
+     * Generate START.
+     * If BUSY=0 -> normal START.
+     * If TC=1 and BUSY=1 -> repeated START.
+     */
+    pI2Cx->I2C_CR2 |= (1U << I2C_CR2_START);
+
+    for (uint32_t i = 0U; i < Len; i++)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_TXIS,
+                                            SET,
+                                            TimeoutMs,
+                                            I2C_STATUS_TXIS_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        pI2Cx->I2C_TXDR = pTxBuffer[i];
+    }
+
+    if (Sr == I2C_DISABLE_SR)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_STOPF,
+                                            SET,
+                                            TimeoutMs,
+                                            I2C_STATUS_STOP_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        I2C_ClearSTOPFlag(pI2Cx);
+    }
+    else
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_TC,
+                                            SET,
+                                            TimeoutMs,
+                                            I2C_STATUS_TC_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+    }
+
+    return I2C_STATUS_OK;
+}
+uint8_t I2C_MasterReceiveWithTimeout(I2C_Handle_t *pI2CHandle,uint8_t *pRxBuffer,uint32_t Len,uint16_t SlaveAddr,uint8_t AddressMode,uint8_t Sr, uint32_t TimeoutMs)
+{
+    uint8_t status;
+    I2C_RegDef_t *pI2Cx;
+    uint32_t cr2 = 0U;
+
+    if ((pI2CHandle == 0) || (pI2CHandle->pI2Cx == 0) || (pRxBuffer == 0))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if ((Len == 0U) || (Len > 255U))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2Cx = pI2CHandle->pI2Cx;
+
+    /*
+     * Normal receive ise BUSY = 0 bekle.
+     * Eğer önceki faz TC ile bittiyse, bu receive repeated START olarak başlayabilir.
+     */
+    if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_TC) != SET)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_BUSY,
+                                            RESET,
+                                            TimeoutMs,
+                                            I2C_STATUS_BUSY_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+    }
+
+    /*
+     * Configure CR2 for master read.
+     */
+    if (AddressMode == I2C_ADDR_MODE_7BIT)
+    {
+        if (SlaveAddr > 0x7FU)
+        {
+            return I2C_STATUS_ERROR;
+        }
+
+        cr2 |= (((uint32_t)SlaveAddr & 0x7FU) << 1U);
+    }
+    else if (AddressMode == I2C_ADDR_MODE_10BIT)
+    {
+        if (SlaveAddr > 0x3FFU)
+        {
+            return I2C_STATUS_ERROR;
+        }
+
+        cr2 |= ((uint32_t)SlaveAddr & 0x3FFU);
+        cr2 |= (1U << I2C_CR2_ADD10);
+
+        /*
+         * If this receive is used after a previous 10-bit write phase,
+         * HEAD10R sends only the read header during repeated START.
+         */
+        if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_TC) == SET)
+        {
+            cr2 |= (1U << I2C_CR2_HEAD10R);
+        }
+    }
+    else
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    /*
+     * Read direction: RD_WRN = 1.
+     */
+    cr2 |= (1U << I2C_CR2_RD_WRN);
+
+    /*
+     * NBYTES.
+     */
+    cr2 |= ((uint32_t)Len << I2C_CR2_NBYTES);
+
+    if (Sr == I2C_DISABLE_SR)
+    {
+        cr2 |= (1U << I2C_CR2_AUTOEND);
+    }
+    else if (Sr == I2C_ENABLE_SR)
+    {
+        cr2 &= ~(1U << I2C_CR2_AUTOEND);
+    }
+    else
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2Cx->I2C_CR2 = cr2;
+
+    /*
+     * Generate START or repeated START.
+     */
+    pI2Cx->I2C_CR2 |= (1U << I2C_CR2_START);
+
+    for (uint32_t i = 0U; i < Len; i++)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_RXNE,
+                                            SET,
+                                            TimeoutMs,
+                                            I2C_STATUS_RXNE_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        pRxBuffer[i] = (uint8_t)pI2Cx->I2C_RXDR;
+    }
+
+    if (Sr == I2C_DISABLE_SR)
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_STOPF,
+                                            SET,
+                                            TimeoutMs,
+                                            I2C_STATUS_STOP_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+
+        I2C_ClearSTOPFlag(pI2Cx);
+    }
+    else
+    {
+        status = I2C_WaitOnFlagUntilTimeout(pI2Cx,
+                                            I2C_FLAG_TC,
+                                            SET,
+                                            TimeoutMs,
+                                            I2C_STATUS_TC_TIMEOUT);
+
+        if (status != I2C_STATUS_OK)
+        {
+            return status;
+        }
+    }
+
+    return I2C_STATUS_OK;
+}
+
+uint8_t I2C_MasterWriteReadWithTimeout(I2C_Handle_t *pI2CHandle, uint16_t SlaveAddr,uint8_t AddressMode,uint8_t *pTxBuffer,uint32_t TxLen, uint8_t *pRxBuffer,uint32_t RxLen, uint32_t TimeoutMs)
+{
+    uint8_t status;
+
+    if ((pI2CHandle == 0) ||
+        (pTxBuffer == 0) ||
+        (pRxBuffer == 0) ||
+        (TxLen == 0U) ||
+        (RxLen == 0U))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    /*
+     * First phase:
+     * Write register address / command bytes.
+     * STOP is disabled, so TC will be set and bus is held.
+     */
+    status = I2C_MasterTransmitWithTimeout(pI2CHandle,
+                                           pTxBuffer,
+                                           TxLen,
+                                           SlaveAddr,
+                                           AddressMode,
+                                           I2C_ENABLE_SR,
+                                           TimeoutMs);
+
+    if (status != I2C_STATUS_OK)
+    {
+        return status;
+    }
+
+    /*
+     * Second phase:
+     * Read data.
+     * Since TC is already set, this START becomes repeated START.
+     * STOP is generated at the end.
+     */
+    status = I2C_MasterReceiveWithTimeout(pI2CHandle,
+                                          pRxBuffer,
+                                          RxLen,
+                                          SlaveAddr,
+                                          AddressMode,
+                                          I2C_DISABLE_SR,
+                                          TimeoutMs);
+
+    return status;
+}
+uint8_t I2C_MasterTransmitIT(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer,uint32_t Len, uint16_t SlaveAddr, uint8_t AddressMode, uint8_t Sr)
+{
+    uint32_t cr2;
+    I2C_RegDef_t *pI2Cx;
+
+    if ((pI2CHandle == 0) || (pI2CHandle->pI2Cx == 0) ||
+        (pTxBuffer == 0) || (Len == 0U))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if (Len > 255U)
+    {
+        return I2C_STATUS_UNSUPPORTED;
+    }
+
+    if (AddressMode != I2C_ADDR_MODE_7BIT)
+    {
+        return I2C_STATUS_UNSUPPORTED;
+    }
+
+    if (pI2CHandle->TxRxState != I2C_READY)
+    {
+        return I2C_STATUS_BUSY;
+    }
+
+    pI2Cx = pI2CHandle->pI2Cx;
+
+    if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_BUSY) == SET)
+    {
+        return I2C_STATUS_BUSY;
+    }
+
+	cr2 = I2C_PrepareCR2(SlaveAddr, AddressMode,I2C_TRANSFER_WRITE, Len, Sr);
+
+
+    if (cr2 == 0U)
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2CHandle->pTxBuffer = pTxBuffer;
+    pI2CHandle->pRxBuffer = 0;
+    pI2CHandle->TxLen = Len;
+    pI2CHandle->RxLen = 0U;
+    pI2CHandle->DevAddr = SlaveAddr;
+    pI2CHandle->AddressMode = AddressMode;
+    pI2CHandle->Sr = Sr;
+    pI2CHandle->TxRxState = I2C_BUSY_IN_TX;
+    pI2CHandle->XferMode = I2C_XFER_MODE_MASTER_TX;
+    pI2CHandle->ErrorCode = I2C_ERROR_NONE;
+
+    I2C_ClearNACKFlag(pI2Cx);
+    I2C_ClearSTOPFlag(pI2Cx);
+    I2C_ClearErrorFlags(pI2Cx);
+
+    /*
+     * Enable I2C interrupts before START.
+     */
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_TXIE);
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_TCIE);
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_STOPIE);
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_NACKIE);
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_ERRIE);
+
+    /*
+     * Configure transfer and generate START.
+     */
+    pI2Cx->I2C_CR2 = (cr2 | (1U << I2C_CR2_START));
+
+    return I2C_STATUS_OK;
+}
+uint8_t I2C_MasterReceiveIT(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer,uint32_t Len, uint16_t SlaveAddr, uint8_t AddressMode, uint8_t Sr)
+{
+    uint32_t cr2;
+    I2C_RegDef_t *pI2Cx;
+
+    if ((pI2CHandle == 0) || (pI2CHandle->pI2Cx == 0) ||
+        (pRxBuffer == 0) || (Len == 0U))
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    if (Len > 255U)
+    {
+        return I2C_STATUS_UNSUPPORTED;
+    }
+
+    if (AddressMode != I2C_ADDR_MODE_7BIT)
+    {
+        return I2C_STATUS_UNSUPPORTED;
+    }
+
+    if (pI2CHandle->TxRxState != I2C_READY)
+    {
+        return I2C_STATUS_BUSY;
+    }
+
+    pI2Cx = pI2CHandle->pI2Cx;
+
+    if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_BUSY) == SET)
+    {
+        return I2C_STATUS_BUSY;
+    }
+
+    cr2 = I2C_PrepareCR2(SlaveAddr,
+                         AddressMode,
+                         I2C_TRANSFER_READ,
+                         Len,
+                         Sr);
+
+    if (cr2 == 0U)
+    {
+        return I2C_STATUS_ERROR;
+    }
+
+    pI2CHandle->pTxBuffer = 0;
+    pI2CHandle->pRxBuffer = pRxBuffer;
+    pI2CHandle->TxLen = 0U;
+    pI2CHandle->RxLen = Len;
+    pI2CHandle->DevAddr = SlaveAddr;
+    pI2CHandle->AddressMode = AddressMode;
+    pI2CHandle->Sr = Sr;
+    pI2CHandle->TxRxState = I2C_BUSY_IN_RX;
+    pI2CHandle->ErrorCode = I2C_ERROR_NONE;
+
+    I2C_ClearNACKFlag(pI2Cx);
+    I2C_ClearSTOPFlag(pI2Cx);
+    I2C_ClearErrorFlags(pI2Cx);
+
+    /*
+     * Enable I2C interrupts before START.
+     */
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_RXIE);
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_TCIE);
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_STOPIE);
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_NACKIE);
+    pI2Cx->I2C_CR1 |= (1U << I2C_CR1_ERRIE);
+
+    /*
+     * Configure transfer and generate START.
+     */
+    pI2Cx->I2C_CR2 = (cr2 | (1U << I2C_CR2_START));
+
+    return I2C_STATUS_OK;
+}
+void I2C_EV_IRQHandling(I2C_RegDef_t *pI2Cx)
+{
+    I2C_Handle_t *pI2CHandle;
+    uint32_t isr;
+    uint32_t cr1;
+
+    pI2CHandle = I2C_GetHandleFromInstance(pI2Cx);
+
+    if (pI2CHandle == 0)
+    {
+        return;
+    }
+
+    isr = pI2Cx->I2C_ISR;
+    cr1 = pI2Cx->I2C_CR1;
+
+    /*
+     * NACK received.
+     */
+    if ((isr & I2C_FLAG_NACKF) && (cr1 & (1U << I2C_CR1_NACKIE)))
+    {
+        I2C_ClearNACKFlag(pI2Cx);
+
+        if (I2C_GetFlagStatus(pI2Cx, I2C_FLAG_STOPF) == SET)
+        {
+            I2C_ClearSTOPFlag(pI2Cx);
+        }
+
+        pI2CHandle->ErrorCode |= I2C_ERROR_NACK;
+
+        if (pI2CHandle->TxRxState == I2C_BUSY_IN_TX)
+        {
+            I2C_CloseSendData(pI2CHandle);
+        }
+        else if (pI2CHandle->TxRxState == I2C_BUSY_IN_RX)
+        {
+            I2C_CloseReceiveData(pI2CHandle);
+        }
+
+        I2C_ApplicationEventCallback(pI2CHandle, I2C_EVENT_NACK);
+        return;
+    }
+
+    /*
+     * TXIS: transmit data register empty and ready.
+     */
+    if ((isr & I2C_FLAG_TXIS) && (cr1 & (1U << I2C_CR1_TXIE)))
+    {
+        if ((pI2CHandle->TxRxState == I2C_BUSY_IN_TX) &&
+            (pI2CHandle->TxLen > 0U))
+        {
+            pI2Cx->I2C_TXDR = *(pI2CHandle->pTxBuffer);
+            pI2CHandle->pTxBuffer++;
+            pI2CHandle->TxLen--;
+        }
+    }
+
+    /*
+     * RXNE: received data available.
+     */
+    if ((isr & I2C_FLAG_RXNE) && (cr1 & (1U << I2C_CR1_RXIE)))
+    {
+        if ((pI2CHandle->TxRxState == I2C_BUSY_IN_RX) &&
+            (pI2CHandle->RxLen > 0U))
+        {
+            *(pI2CHandle->pRxBuffer) = (uint8_t)pI2Cx->I2C_RXDR;
+            pI2CHandle->pRxBuffer++;
+            pI2CHandle->RxLen--;
+        }
+    }
+
+    /*
+     * TC: transfer complete, but STOP is not generated because AUTOEND = 0.
+     * This is used when Sr is enabled.
+     */
+    if ((isr & I2C_FLAG_TC) && (cr1 & (1U << I2C_CR1_TCIE)))
+    {
+        if (pI2CHandle->Sr == I2C_ENABLE_SR)
+        {
+            if (pI2CHandle->TxRxState == I2C_BUSY_IN_TX)
+            {
+                I2C_CloseSendData(pI2CHandle);
+                I2C_ApplicationEventCallback(pI2CHandle,
+                                             I2C_EVENT_TX_CMPLT);
+            }
+            else if (pI2CHandle->TxRxState == I2C_BUSY_IN_RX)
+            {
+                I2C_CloseReceiveData(pI2CHandle);
+                I2C_ApplicationEventCallback(pI2CHandle,
+                                             I2C_EVENT_RX_CMPLT);
+            }
+        }
+    }
+
+    /*
+     * STOPF: transfer completed with STOP condition.
+     * This is the normal completion path when Sr is disabled.
+     */
+    if ((isr & I2C_FLAG_STOPF) && (cr1 & (1U << I2C_CR1_STOPIE)))
+    {
+        I2C_ClearSTOPFlag(pI2Cx);
+
+        if (pI2CHandle->TxRxState == I2C_BUSY_IN_TX)
+        {
+            I2C_CloseSendData(pI2CHandle);
+            I2C_ApplicationEventCallback(pI2CHandle,
+                                         I2C_EVENT_TX_CMPLT);
+        }
+        else if (pI2CHandle->TxRxState == I2C_BUSY_IN_RX)
+        {
+            I2C_CloseReceiveData(pI2CHandle);
+            I2C_ApplicationEventCallback(pI2CHandle,
+                                         I2C_EVENT_RX_CMPLT);
+        }
+        else
+        {
+            I2C_ApplicationEventCallback(pI2CHandle,
+                                         I2C_EVENT_STOP);
+        }
+    }
+}
+void I2C_ER_IRQHandling(I2C_RegDef_t *pI2Cx)
+{
+    I2C_Handle_t *pI2CHandle;
+    uint32_t isr;
+    uint32_t cr1;
+    uint8_t event = 0U;
+
+    pI2CHandle = I2C_GetHandleFromInstance(pI2Cx);
+
+    if (pI2CHandle == 0)
+    {
+        return;
+    }
+
+    isr = pI2Cx->I2C_ISR;
+    cr1 = pI2Cx->I2C_CR1;
+
+    if ((cr1 & (1U << I2C_CR1_ERRIE)) == 0U)
+    {
+        return;
+    }
+
+    if (isr & I2C_FLAG_BERR)
+    {
+        pI2CHandle->ErrorCode |= I2C_ERROR_BERR;
+        pI2Cx->I2C_ICR = (1U << I2C_ICR_BERRCF);
+        event = I2C_EVENT_BERR;
+    }
+    else if (isr & I2C_FLAG_ARLO)
+    {
+        pI2CHandle->ErrorCode |= I2C_ERROR_ARLO;
+        pI2Cx->I2C_ICR = (1U << I2C_ICR_ARLOCF);
+        event = I2C_EVENT_ARLO;
+    }
+    else if (isr & I2C_FLAG_OVR)
+    {
+        pI2CHandle->ErrorCode |= I2C_ERROR_OVR;
+        pI2Cx->I2C_ICR = (1U << I2C_ICR_OVRCF);
+        event = I2C_EVENT_OVR;
+    }
+    else if (isr & I2C_FLAG_TIMEOUT)
+    {
+        pI2CHandle->ErrorCode |= I2C_ERROR_TIMEOUT;
+        pI2Cx->I2C_ICR = (1U << I2C_ICR_TIMOUTCF);
+        event = I2C_EVENT_TIMEOUT;
+    }
+
+    if (event != 0U)
+    {
+        if (pI2CHandle->TxRxState == I2C_BUSY_IN_TX)
+        {
+            I2C_CloseSendData(pI2CHandle);
+        }
+        else if (pI2CHandle->TxRxState == I2C_BUSY_IN_RX)
+        {
+            I2C_CloseReceiveData(pI2CHandle);
+        }
+
+        I2C_ApplicationEventCallback(pI2CHandle, event);
+    }
+}
+__attribute__((weak)) void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle,
+                                                       uint8_t Event)
+{
+    (void)pI2CHandle;
+    (void)Event;
+}

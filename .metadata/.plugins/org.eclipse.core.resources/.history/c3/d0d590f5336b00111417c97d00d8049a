@@ -1,0 +1,38 @@
+/*
+ * examples.h
+ *
+ *  Created on: Jun 4, 2026
+ *      Author: furkan
+ */
+
+#ifndef INC_EXAMPLES_H_
+#define INC_EXAMPLES_H_
+
+void EX001_GPIO_LedBlink(void);
+void EX002_GPIO_LedSetReset(void);
+void EX003_GPIO_ButtonInput(void);
+void EX004_GPIO_DeInitTest(void);
+void EX005_GPIO_ButtonInterrupt(void);
+void EX006_SysTickLedBlink(void);
+void EX007_USART3_Tx(void);
+void EX008_USART3_RxEcho(void);
+void EX009_USART3_InterruptRxEcho(void);
+void EX010_USART3_Packet10Byte(void);
+void EX011_USART3_PacketParser(void);
+void EX012_SPI1_Loopback(void);
+void EX013_SPI1_Loopback_WithCS(void);
+void EX014_SPI1_SendReceive_Test(void);
+void EX015_I2C1_Init_Test(void);
+void EX016_I2C1_MasterSend_NACK_Test(void);
+void EX017_I2C1_Scanner_Test(void);
+void EX018_I2C1_SSD1306_Command_Test(void);
+void EX019_USART3_InterruptTx_Test(void);
+void EX020_USART3_IdleRx_Test(void);
+void EX021_SPI1_Loopback_IT_Test(void);
+void EX022_SPI1_Send_IT_Test(void);
+void EX023_SPI1_Receive_IT_Test(void);
+void EX024_I2C1_IT_NACK_Test(void);
+void EX025_I2C1_IT_RxNACK_Test(void);
+void EX026_I2C1_IT_Tx_To_I2C2_Slave_Test(void);
+void EX027_I2C1_IT_Rx_From_I2C2_Slave_Test(void);
+#endif /* INC_EXAMPLES_H_ */

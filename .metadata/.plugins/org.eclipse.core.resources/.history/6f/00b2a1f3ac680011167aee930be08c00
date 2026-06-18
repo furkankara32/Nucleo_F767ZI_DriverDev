@@ -1,0 +1,173 @@
+/*
+ * stm32f767xx_spi_driver.h
+ *
+ *  Created on: Jun 7, 2026
+ *      Author: furkan
+ */
+
+#ifndef MYDRIVERS_INC_STM32F767XX_SPI_DRIVER_H_
+#define MYDRIVERS_INC_STM32F767XX_SPI_DRIVER_H_
+
+#include "stm32f767xx.h"
+
+/*
+ * SPI status codes
+ */
+#define SPI_STATUS_OK             0U
+#define SPI_STATUS_TIMEOUT        1U
+#define SPI_STATUS_ERROR          2U
+#define SPI_STATUS_BUSY_TIMEOUT   3U
+#define SPI_STATUS_TXE_TIMEOUT    4U
+#define SPI_STATUS_RXNE_TIMEOUT   5U
+#define SPI_STATUS_BUSY           6U
+#define SPI_STATUS_UNSUPPORTED    7U
+/*
+ * SPI device mode
+ */
+#define SPI_DEVICE_MODE_SLAVE     0U
+#define SPI_DEVICE_MODE_MASTER    1U
+
+/*
+ * SPI bus config
+ */
+#define SPI_BUS_CONFIG_FULL_DUPLEX      0U
+#define SPI_BUS_CONFIG_HALF_DUPLEX      1U
+#define SPI_BUS_CONFIG_SIMPLEX_RXONLY   2U
+
+/*
+ * SPI clock speed prescaler
+ */
+#define SPI_SCLK_SPEED_DIV2       0U
+#define SPI_SCLK_SPEED_DIV4       1U
+#define SPI_SCLK_SPEED_DIV8       2U
+#define SPI_SCLK_SPEED_DIV16      3U
+#define SPI_SCLK_SPEED_DIV32      4U
+#define SPI_SCLK_SPEED_DIV64      5U
+#define SPI_SCLK_SPEED_DIV128     6U
+#define SPI_SCLK_SPEED_DIV256     7U
+
+/*
+ * SPI data size
+ */
+#define SPI_DATA_SIZE_8BIT        8U
+#define SPI_DATA_SIZE_16BIT       16U
+
+/*
+ * SPI CPOL
+ */
+#define SPI_CPOL_LOW              0U
+#define SPI_CPOL_HIGH             1U
+
+/*
+ * SPI CPHA
+ */
+#define SPI_CPHA_FIRST_EDGE       0U
+#define SPI_CPHA_SECOND_EDGE      1U
+
+/*
+ * SPI software slave management
+ */
+#define SPI_SSM_DISABLE           0U
+#define SPI_SSM_ENABLE            1U
+
+/*
+ * SPI error mask values
+ */
+#define SPI_ERROR_NONE          0x00U
+#define SPI_ERROR_OVR           0x01U
+#define SPI_ERROR_MODF          0x02U
+#define SPI_ERROR_CRC           0x04U
+#define SPI_ERROR_FRE           0x08U
+
+/*
+ * SPI application states
+ */
+#define SPI_READY                 0U
+#define SPI_BUSY_IN_TX            1U
+#define SPI_BUSY_IN_RX            2U
+
+/*
+ * SPI transfer modes
+ */
+#define SPI_TRANSFER_MODE_NONE    0U
+#define SPI_TRANSFER_MODE_TX_ONLY 1U
+#define SPI_TRANSFER_MODE_RX_ONLY 2U
+#define SPI_TRANSFER_MODE_TX_RX   3U
+
+/*
+ * SPI application events
+ */
+#define SPI_EVENT_TX_CMPLT        0U
+#define SPI_EVENT_RX_CMPLT        1U
+#define SPI_EVENT_TX_RX_CMPLT     2U
+#define SPI_EVENT_OVR_ERR         3U
+#define SPI_EVENT_MODF_ERR        4U
+#define SPI_EVENT_CRC_ERR         5U
+#define SPI_EVENT_FRE_ERR         6U
+
+typedef struct
+{
+	uint8_t SPI_DeviceMode;
+	uint8_t SPI_BusConfig;
+	uint8_t SPI_SclkSpeed;
+	uint8_t SPI_DataSize;
+	uint8_t SPI_CPOL;
+	uint8_t SPI_CPHA;
+	uint8_t SPI_SSM;
+
+} SPI_Config_t;
+
+typedef struct
+{
+	SPI_RegDef_t *pSPIx;
+	SPI_Config_t SPI_Config;
+
+} SPI_Handle_t;
+
+
+/*
+ * Peripheral clock setup
+ */
+void SPI_PeriClockControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
+
+/*
+ * Init / DeInit
+ */
+uint8_t SPI_Init(SPI_Handle_t *pSPIHandle);
+void SPI_DeInit(SPI_RegDef_t *pSPIx);
+
+/*
+ * Peripheral control
+ */
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
+
+/*
+ * Data send / receive
+ */
+uint8_t SPI_SendDataWithTimeout(SPI_Handle_t *pSPIHandle,
+								uint8_t *pTxBuffer,
+								uint32_t Len,
+								uint32_t TimeoutMs);
+
+uint8_t SPI_ReceiveDataWithTimeout(SPI_Handle_t *pSPIHandle,
+								   uint8_t *pRxBuffer,
+								   uint32_t Len,
+								   uint32_t TimeoutMs);
+
+uint8_t SPI_TransmitReceiveWithTimeout(SPI_Handle_t *pSPIHandle,
+									   uint8_t *pTxBuffer,
+									   uint8_t *pRxBuffer,
+									   uint32_t Len,
+									   uint32_t TimeoutMs);
+
+/*
+ * Flag status
+ */
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName);
+uint8_t SPI_GetErrorStatus(SPI_RegDef_t *pSPIx);
+void SPI_ClearOVRFlag(SPI_RegDef_t *pSPIx);
+void SPI_ClearMODFFlag(SPI_RegDef_t *pSPIx);
+void SPI_ClearCRCERRFlag(SPI_RegDef_t *pSPIx);
+void SPI_ClearFREFlag(SPI_RegDef_t *pSPIx);
+void SPI_ClearErrorFlags(SPI_RegDef_t *pSPIx);
+#endif /* MYDRIVERS_INC_STM32F767XX_SPI_DRIVER_H_ */

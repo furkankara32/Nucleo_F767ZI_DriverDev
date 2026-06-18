@@ -19,7 +19,8 @@
 #define SPI_STATUS_BUSY_TIMEOUT   3U
 #define SPI_STATUS_TXE_TIMEOUT    4U
 #define SPI_STATUS_RXNE_TIMEOUT   5U
-
+#define SPI_STATUS_BUSY           6U
+#define SPI_STATUS_UNSUPPORTED    7U
 /*
  * SPI device mode
  */
@@ -78,6 +79,32 @@
 #define SPI_ERROR_CRC           0x04U
 #define SPI_ERROR_FRE           0x08U
 
+/*
+ * SPI application states
+ */
+#define SPI_READY                 0U
+#define SPI_BUSY_IN_TX            1U
+#define SPI_BUSY_IN_RX            2U
+
+/*
+ * SPI transfer modes
+ */
+#define SPI_TRANSFER_MODE_NONE    0U
+#define SPI_TRANSFER_MODE_TX_ONLY 1U
+#define SPI_TRANSFER_MODE_RX_ONLY 2U
+#define SPI_TRANSFER_MODE_TX_RX   3U
+
+/*
+ * SPI application events
+ */
+#define SPI_EVENT_TX_CMPLT        0U
+#define SPI_EVENT_RX_CMPLT        1U
+#define SPI_EVENT_TX_RX_CMPLT     2U
+#define SPI_EVENT_OVR_ERR         3U
+#define SPI_EVENT_MODF_ERR        4U
+#define SPI_EVENT_CRC_ERR         5U
+#define SPI_EVENT_FRE_ERR         6U
+
 typedef struct
 {
 	uint8_t SPI_DeviceMode;
@@ -95,8 +122,17 @@ typedef struct
 	SPI_RegDef_t *pSPIx;
 	SPI_Config_t SPI_Config;
 
-} SPI_Handle_t;
+	uint8_t *pTxBuffer;
+	uint8_t *pRxBuffer;
 
+	uint32_t TxLen;
+	uint32_t RxLen;
+
+	volatile uint8_t TxState;
+	volatile uint8_t RxState;
+	volatile uint8_t TransferMode;
+
+} SPI_Handle_t;
 
 /*
  * Peripheral clock setup
@@ -117,21 +153,27 @@ void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
 /*
  * Data send / receive
  */
-uint8_t SPI_SendDataWithTimeout(SPI_Handle_t *pSPIHandle,
-								uint8_t *pTxBuffer,
-								uint32_t Len,
-								uint32_t TimeoutMs);
+uint8_t SPI_SendDataWithTimeout(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer,uint32_t Len, uint32_t TimeoutMs);
+uint8_t SPI_ReceiveDataWithTimeout(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer,uint32_t Len, uint32_t TimeoutMs);
+uint8_t SPI_TransmitReceiveWithTimeout(SPI_Handle_t *pSPIHandle,uint8_t *pTxBuffer, uint8_t *pRxBuffer, uint32_t Len,uint32_t TimeoutMs);
 
-uint8_t SPI_ReceiveDataWithTimeout(SPI_Handle_t *pSPIHandle,
-								   uint8_t *pRxBuffer,
-								   uint32_t Len,
-								   uint32_t TimeoutMs);
 
-uint8_t SPI_TransmitReceiveWithTimeout(SPI_Handle_t *pSPIHandle,
-									   uint8_t *pTxBuffer,
-									   uint8_t *pRxBuffer,
-									   uint32_t Len,
-									   uint32_t TimeoutMs);
+/*
+ * Non-blocking interrupt based data transfer
+ */
+uint8_t SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer,uint32_t Len);
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer,uint32_t Len);
+uint8_t SPI_TransmitReceiveIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer,uint8_t *pRxBuffer, uint32_t Len);
+
+/*
+ * IRQ handling
+ */
+void SPI_IRQHandling(SPI_RegDef_t *pSPIx);
+void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle, uint8_t Event);
+
+
+void SPI_CloseTransmission(SPI_Handle_t *pSPIHandle);
+void SPI_CloseReception(SPI_Handle_t *pSPIHandle);
 
 /*
  * Flag status

@@ -22,7 +22,8 @@
 #define I2C_STATUS_TC_TIMEOUT      6U
 #define I2C_STATUS_STOP_TIMEOUT    7U
 #define I2C_STATUS_NACK            8U
-
+#define I2C_STATUS_BUSY            9U
+#define I2C_STATUS_UNSUPPORTED     10U
 /*
  * I2C analog filter
  *
@@ -95,6 +96,34 @@
 #define I2C_ERROR_OVR               0x04U
 #define I2C_ERROR_TIMEOUT           0x08U
 #define I2C_ERROR_NACK              0x10U
+/*
+ * I2C application states
+ */
+#define I2C_READY                  0U
+#define I2C_BUSY_IN_TX             1U
+#define I2C_BUSY_IN_RX             2U
+#define I2C_BUSY_IN_TX_RX          3U
+
+/*
+ * I2C transfer modes
+ */
+#define I2C_XFER_MODE_NONE         0U
+#define I2C_XFER_MODE_MASTER_TX    1U
+#define I2C_XFER_MODE_MASTER_RX    2U
+#define I2C_XFER_MODE_WRITE_READ   3U
+
+/*
+ * I2C application events
+ */
+#define I2C_EVENT_TX_CMPLT         0U
+#define I2C_EVENT_RX_CMPLT         1U
+#define I2C_EVENT_STOP             2U
+#define I2C_EVENT_NACK             3U
+#define I2C_EVENT_BERR             4U
+#define I2C_EVENT_ARLO             5U
+#define I2C_EVENT_OVR              6U
+#define I2C_EVENT_TIMEOUT          7U
+#define I2C_EVENT_WR_RD_CMPLT      8U
 
 typedef struct
 {
@@ -108,6 +137,16 @@ typedef struct
 {
     I2C_RegDef_t *pI2Cx;
     I2C_Config_t I2C_Config;
+    uint8_t *pTxBuffer;
+    uint8_t *pRxBuffer;
+    uint32_t TxLen;
+    uint32_t RxLen;
+    uint16_t DevAddr;
+    uint8_t AddressMode;
+    uint8_t Sr;
+    volatile uint8_t TxRxState;
+    volatile uint8_t ErrorCode;
+    volatile uint8_t XferMode;
 } I2C_Handle_t;
 
 
@@ -142,4 +181,30 @@ uint8_t I2C_MasterReceiveWithTimeout(I2C_Handle_t *pI2CHandle,uint8_t *pRxBuffer
 uint8_t I2C_MasterWriteReadWithTimeout(I2C_Handle_t *pI2CHandle, uint16_t SlaveAddr,uint8_t AddressMode,uint8_t *pTxBuffer,uint32_t TxLen, uint8_t *pRxBuffer,uint32_t RxLen, uint32_t TimeoutMs);
 uint8_t I2C_IsDeviceReadyWithTimeout(I2C_Handle_t *pI2CHandle, uint16_t SlaveAddr,uint8_t AddressMode,uint32_t TimeoutMs);
 
+/*
+ * Non-blocking interrupt based master APIs
+ */
+uint8_t I2C_MasterTransmitIT(I2C_Handle_t *pI2CHandle, uint8_t *pTxBuffer,uint32_t Len, uint16_t SlaveAddr, uint8_t AddressMode, uint8_t Sr);
+
+uint8_t I2C_MasterReceiveIT(I2C_Handle_t *pI2CHandle, uint8_t *pRxBuffer,uint32_t Len, uint16_t SlaveAddr, uint8_t AddressMode, uint8_t Sr);
+
+uint8_t I2C_MasterWriteReadIT(I2C_Handle_t *pI2CHandle, uint16_t SlaveAddr,uint8_t AddressMode, uint8_t *pTxBuffer, uint32_t TxLen,uint8_t *pRxBuffer, uint32_t RxLen);
+
+/*
+ * IRQ handling
+ */
+void I2C_EV_IRQHandling(I2C_RegDef_t *pI2Cx);
+void I2C_ER_IRQHandling(I2C_RegDef_t *pI2Cx);
+
+/*
+ * Close helpers
+ */
+void I2C_CloseSendData(I2C_Handle_t *pI2CHandle);
+void I2C_CloseReceiveData(I2C_Handle_t *pI2CHandle);
+
+/*
+ * Application callback
+ */
+void I2C_ApplicationEventCallback(I2C_Handle_t *pI2CHandle,
+                                  uint8_t Event);
 #endif /* MYDRIVERS_INC_STM32F767XX_I2C_DRIVER_H_ */

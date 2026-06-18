@@ -5,6 +5,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Drivers/MyDrivers/Src/ex019_usart3_it_tx_test.c \
 ../Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.c \
 ../Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.c \
 ../Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.c \
@@ -14,6 +15,7 @@ C_SRCS += \
 ../Drivers/MyDrivers/Src/stm32f767xx_usart_driver.c 
 
 OBJS += \
+./Drivers/MyDrivers/Src/ex019_usart3_it_tx_test.o \
 ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.o \
 ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.o \
 ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.o \
@@ -23,6 +25,7 @@ OBJS += \
 ./Drivers/MyDrivers/Src/stm32f767xx_usart_driver.o 
 
 C_DEPS += \
+./Drivers/MyDrivers/Src/ex019_usart3_it_tx_test.d \
 ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.d \
 ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.d \
 ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.d \
@@ -39,7 +42,7 @@ Drivers/MyDrivers/Src/%.o Drivers/MyDrivers/Src/%.su Drivers/MyDrivers/Src/%.cyc
 clean: clean-Drivers-2f-MyDrivers-2f-Src
 
 clean-Drivers-2f-MyDrivers-2f-Src:
-	-$(RM) ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_spi_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_spi_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_spi_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_spi_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_systick_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_systick_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_systick_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_systick_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_usart_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_usart_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_usart_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_usart_driver.su
+	-$(RM) ./Drivers/MyDrivers/Src/ex019_usart3_it_tx_test.cyclo ./Drivers/MyDrivers/Src/ex019_usart3_it_tx_test.d ./Drivers/MyDrivers/Src/ex019_usart3_it_tx_test.o ./Drivers/MyDrivers/Src/ex019_usart3_it_tx_test.su ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_gpio_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_i2c_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_nvic_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_rcc_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_spi_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_spi_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_spi_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_spi_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_systick_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_systick_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_systick_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_systick_driver.su ./Drivers/MyDrivers/Src/stm32f767xx_usart_driver.cyclo ./Drivers/MyDrivers/Src/stm32f767xx_usart_driver.d ./Drivers/MyDrivers/Src/stm32f767xx_usart_driver.o ./Drivers/MyDrivers/Src/stm32f767xx_usart_driver.su
 
 .PHONY: clean-Drivers-2f-MyDrivers-2f-Src
 

@@ -1,0 +1,159 @@
+/*
+ * ex019_usart3_it_tx_test.c
+ *
+ *  Created on: Jun 14, 2026
+ *      Author: furkan
+ */
+
+#include "stm32f767xx_gpio_driver.h"
+#include "stm32f767xx_usart_driver.h"
+#include "stm32f767xx_systick_driver.h"
+#include "stm32f767xx_nvic_driver.h"
+#include "examples_config.h"
+
+#if ACTIVE_EXAMPLE == EXAMPLE_USART3_IT_TX_TEST
+
+static USART_Handle_t USART3Handle;
+
+static volatile uint32_t g_tx_complete_count = 0U;
+static volatile uint32_t g_tx_busy_count = 0U;
+static volatile uint8_t  g_tx_done = 1U;
+
+/*
+ * Non-blocking TX'te buffer gönderim bitene kadar geçerli kalmalı.
+ * Bu yüzden mesajları static/global tutuyoruz.
+ */
+static uint8_t g_start_msg[] =
+	"USART3 interrupt TX test started.\r\n";
+
+static uint8_t g_periodic_msg[] =
+	"USART3 TX interrupt message.\r\n";
+
+static void USART3_GPIOInits(void)
+{
+	GPIO_Handle_t GpioUart;
+
+	/*
+	 * USART3_TX -> PD8
+	 * USART3_RX -> PD9
+	 * Alternate Function: AF7
+	 */
+	GpioUart.pGPIOx = GPIOD;
+	GpioUart.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
+	GpioUart.GPIO_PinConfig.GPIO_PinOPType = GPIO_OP_TYPE_PP;
+	GpioUart.GPIO_PinConfig.GPIO_PinPuPdControl = GPIO_PIN_PU;
+	GpioUart.GPIO_PinConfig.GPIO_PinSpeed = GPIO_SPEED_FAST;
+	GpioUart.GPIO_PinConfig.GPIO_PinAltFunMode = 7U;
+
+	GpioUart.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_8;
+	GPIO_Init(&GpioUart);
+
+	GpioUart.GPIO_PinConfig.GPIO_PinNumber = GPIO_PIN_NO_9;
+	GPIO_Init(&GpioUart);
+}
+
+static void USART3_Inits(void)
+{
+	USART3Handle.pUSARTx = USART3;
+
+	USART3Handle.USART_Config.USART_Mode = USART_MODE_TXRX;
+	USART3Handle.USART_Config.USART_Baud = 115200U;
+	USART3Handle.USART_Config.USART_WordLength = USART_WORDLEN_8BITS;
+	USART3Handle.USART_Config.USART_StopBits = USART_STOPBITS_1;
+	USART3Handle.USART_Config.USART_ParityControl = USART_PARITY_DISABLE;
+	USART3Handle.USART_Config.USART_Oversampling = USART_OVERSAMPLING_16;
+	USART3Handle.USART_Config.USART_PeripheralClockHz = 0U;
+
+	USART_Init(&USART3Handle);
+}
+
+void EX019_USART3_InterruptTx_Test(void)
+{
+	uint32_t last_tick = 0U;
+	uint8_t status;
+
+	SysTick_Init(16000000U);
+
+	USART3_GPIOInits();
+	USART3_Inits();
+
+	/*
+	 * USART3 global interrupt enable.
+	 */
+	NVIC_IRQPriorityConfig(IRQ_NO_USART3, 15U);
+	NVIC_IRQInterruptConfig(IRQ_NO_USART3, ENABLE);
+
+	/*
+	 * First non-blocking message.
+	 */
+	g_tx_done = 0U;
+
+	status = USART_SendDataIT(&USART3Handle,
+							  g_start_msg,
+							  sizeof(g_start_msg) - 1U);
+
+	if (status != USART_STATUS_OK)
+	{
+		g_tx_done = 1U;
+	}
+
+	while (1)
+	{
+		/*
+		 * Main loop boşta kalmıyor.
+		 * Her 1000 ms'de bir yeni mesaj göndermeyi deniyoruz.
+		 */
+		if ((millis() - last_tick) >= 1000U)
+		{
+			last_tick = millis();
+
+			if (g_tx_done == 1U)
+			{
+				g_tx_done = 0U;
+
+				status = USART_SendDataIT(&USART3Handle,
+										  g_periodic_msg,
+										  sizeof(g_periodic_msg) - 1U);
+
+				if (status == USART_STATUS_BUSY)
+				{
+					g_tx_busy_count++;
+					g_tx_done = 1U;
+				}
+				else if (status != USART_STATUS_OK)
+				{
+					g_tx_done = 1U;
+				}
+			}
+		}
+
+		/*
+		 * Buraya başka işler koyabilirsin:
+		 * sensor okuma, parser, state machine, LED, vs.
+		 */
+	}
+}
+
+/*
+ * USART3 IRQ handler.
+ * Startup dosyası interrupt gelince bu fonksiyonu çağırır.
+ */
+void USART3_IRQHandler(void)
+{
+	USART_IRQHandling(USART3);
+}
+
+void USART_ApplicationEventCallback(USART_Handle_t *pUSARTHandle,
+									uint8_t Event)
+{
+	if (pUSARTHandle->pUSARTx == USART3)
+	{
+		if (Event == USART_EVENT_TX_CMPLT)
+		{
+			g_tx_complete_count++;
+			g_tx_done = 1U;
+		}
+	}
+}
+
+#endif /* ACTIVE_EXAMPLE == EXAMPLE_USART3_IT_TX_TEST */

@@ -21,6 +21,7 @@
 #define USART_STATUS_NO_DATA         6U
 #define USART_STATUS_TEACK_TIMEOUT   7U
 #define USART_STATUS_REACK_TIMEOUT   8U
+#define USART_STATUS_BUSY            9U
 
 /*
  * USART mode
@@ -65,6 +66,7 @@
 #define USART_INTERRUPT_TC           2U
 #define USART_INTERRUPT_PE           3U
 #define USART_INTERRUPT_ERR          4U
+#define USART_INTERRUPT_IDLE         5U
 
 /*
  * USART Events
@@ -75,6 +77,8 @@
 #define USART_EVENT_FRAME_ERROR       3U
 #define USART_EVENT_NOISE_ERROR       4U
 #define USART_EVENT_OVERRUN_ERROR     5U
+#define USART_EVENT_TX_CMPLT          6U
+#define USART_EVENT_IDLE              7U
 
 /*
  * USART error mask values
@@ -88,6 +92,13 @@
  * Init Timeout Macro
  */
 #define USART_INIT_TIMEOUT_MS        100U
+
+/*
+ * USART application states
+ */
+#define USART_READY                  0U
+#define USART_BUSY_IN_TX             1U
+#define USART_BUSY_IN_RX             2U
 
 typedef struct
 {
@@ -109,6 +120,15 @@ typedef struct
 {
 	USART_RegDef_t *pUSARTx;
 	USART_Config_t USART_Config;
+	/*
+	 * Non-blocking
+	 */
+	uint8_t *pTxBuffer;
+	uint32_t TxLen;
+	volatile uint8_t TxBusyState;
+	/*
+	 * RX ring buffer
+	 */
 	uint8_t *pRxRingBuffer;
 	uint16_t RxRingBufferSize;
 	volatile uint16_t RxHead;
@@ -135,15 +155,16 @@ void USART_PeripheralControl(USART_RegDef_t *pUSARTx, uint8_t EnorDi);
 /*
  * Data send / receive with timeout
  */
-uint8_t USART_SendDataWithTimeout(USART_Handle_t *pUSARTHandle,
-								  uint8_t *pTxBuffer,
-								  uint32_t Len,
-								  uint32_t TimeoutMs);
+uint8_t USART_SendDataWithTimeout(USART_Handle_t *pUSARTHandle,uint8_t *pTxBuffer,uint32_t Len,uint32_t TimeoutMs);
 
-uint8_t USART_ReceiveDataWithTimeout(USART_Handle_t *pUSARTHandle,
-									 uint8_t *pRxBuffer,
-									 uint32_t Len,
-									 uint32_t TimeoutMs);
+
+uint8_t USART_ReceiveDataWithTimeout(USART_Handle_t *pUSARTHandle,uint8_t *pRxBuffer,uint32_t Len,uint32_t TimeoutMs);
+
+/*
+ * Non-blocking interrupt based data send function
+ */
+uint8_t USART_SendDataIT(USART_Handle_t *pUSARTHandle, uint8_t *pTxBuffer,uint32_t Len);
+void USART_CloseTransmission(USART_Handle_t *pUSARTHandle);
 
 /*
  * Flag status
@@ -154,24 +175,19 @@ void USART_ClearErrorFlags(USART_RegDef_t *pUSARTx);
 /*
  * USART Interrupt
  */
-void USART_PeripheralInterruptControl(USART_RegDef_t *pUSARTx,
-									  uint8_t InterruptName,
-									  uint8_t EnorDi);
+void USART_PeripheralInterruptControl(USART_RegDef_t *pUSARTx,uint8_t InterruptName,uint8_t EnorDi);
 
 void USART_IRQHandling(USART_RegDef_t *pUSARTx);
 
-uint8_t USART_RxRingBufferInit(USART_Handle_t *pUSARTHandle,
-							   uint8_t *pBuffer,
-							   uint16_t Size);
+uint8_t USART_RxRingBufferInit(USART_Handle_t *pUSARTHandle,uint8_t *pBuffer,uint16_t Size);
 
 uint16_t USART_RxAvailable(USART_Handle_t *pUSARTHandle);
 
-uint8_t USART_RxReadByte(USART_Handle_t *pUSARTHandle,
-						 uint8_t *pData);
-uint16_t USART_RxReadBytes(USART_Handle_t *pUSARTHandle,
-						   uint8_t *pBuffer,
-						   uint16_t Len);
-void USART_ApplicationEventCallback(USART_Handle_t *pUSARTHandle,
-									uint8_t Event);
+uint8_t USART_RxReadByte(USART_Handle_t *pUSARTHandle,uint8_t *pData);
+
+uint16_t USART_RxReadBytes(USART_Handle_t *pUSARTHandle,uint8_t *pBuffer, uint16_t Len);
+
+void USART_ApplicationEventCallback(USART_Handle_t *pUSARTHandle,uint8_t Event);
+
 
 #endif /* MYDRIVERS_INC_STM32F767XX_USART_DRIVER_H_ */

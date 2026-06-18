@@ -1,10 +1,10 @@
-14:11:41 **** Incremental Build of configuration Debug for project Nucleo_F767ZI_DriverDev ****
+00:28:21 **** Incremental Build of configuration Debug for project Nucleo_F767ZI_DriverDev ****
 make -j8 all 
 arm-none-eabi-size  Nucleo_F767ZI_DriverDev.elf 
    text	   data	    bss	    dec	    hex	filename
-   6288	      0	   1680	   7968	   1f20	Nucleo_F767ZI_DriverDev.elf
+   8840	      4	   1804	  10648	   2998	Nucleo_F767ZI_DriverDev.elf
 Finished building: default.size.stdout
  
 
-14:11:41 Build Finished. 0 errors, 0 warnings. (took 516ms)
+00:28:22 Build Finished. 0 errors, 0 warnings. (took 949ms)
 

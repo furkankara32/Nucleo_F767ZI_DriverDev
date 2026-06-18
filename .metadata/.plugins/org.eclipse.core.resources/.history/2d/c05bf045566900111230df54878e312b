@@ -1,0 +1,38 @@
+/*
+ * examples_config.h
+ *
+ *  Created on: Jun 4, 2026
+ *      Author: furkan
+ */
+
+#ifndef INC_EXAMPLES_CONFIG_H_
+#define INC_EXAMPLES_CONFIG_H_
+
+#define EXAMPLE_GPIO_LED_BLINK        		1
+#define EXAMPLE_GPIO_LED_SET_RESET    		2
+#define EXAMPLE_GPIO_BUTTON_INPUT     		3
+#define EXAMPLE_GPIO_DEINIT_TEST	  		4
+#define EXAMPLE_GPIO_BUTTON_INTERRUPT   	5
+#define EXAMPLE_SYSTICK_LED_BLINK       	6
+#define EXAMPLE_USART3_TX               	7
+#define EXAMPLE_USART3_RX_ECHO          	8
+#define EXAMPLE_USART3_IT_RX_ECHO       	9
+#define EXAMPLE_USART3_PACKET_10BYTE    	10
+#define EXAMPLE_USART3_PACKET_PARSER    	11
+#define EXAMPLE_SPI1_LOOPBACK				12
+#define EXAMPLE_SPI1_LOOPBACK_WITH_CS   	13
+#define EXAMPLE_SPI1_SEND_RECEIVE_TEST  	14
+#define EXAMPLE_I2C1_INIT_TEST              15
+#define EXAMPLE_I2C1_MASTER_SEND_NACK_TEST  16
+#define EXAMPLE_I2C1_SCANNER_TEST           17
+#define EXAMPLE_I2C1_SSD1306_COMMAND_TEST   18
+#define EXAMPLE_USART3_IT_TX_TEST        	19
+#define EXAMPLE_USART3_IDLE_RX_TEST      	20
+#define EXAMPLE_SPI1_LOOPBACK_IT_TEST    	21
+#define EXAMPLE_SPI1_SEND_IT_TEST        	22
+/*
+ * Choose test code
+ */
+#define ACTIVE_EXAMPLE                  EXAMPLE_SPI1_SEND_IT_TEST
+
+#endif /* INC_EXAMPLES_CONFIG_H_ */

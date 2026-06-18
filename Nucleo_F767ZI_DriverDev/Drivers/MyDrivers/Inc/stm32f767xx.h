@@ -514,6 +514,27 @@ typedef struct
 #define IRQ_NO_UART8         83U
 
 /*
+ * IRQ numbers for SPI
+ */
+#define IRQ_NO_SPI1          35U
+#define IRQ_NO_SPI2          36U
+#define IRQ_NO_SPI3          51U
+#define IRQ_NO_SPI4          84U
+#define IRQ_NO_SPI5          85U
+#define IRQ_NO_SPI6          86U
+
+/*
+ * IRQ numbers for I2C
+ */
+#define IRQ_NO_I2C1_EV       31U
+#define IRQ_NO_I2C1_ER       32U
+#define IRQ_NO_I2C2_EV       33U
+#define IRQ_NO_I2C2_ER       34U
+#define IRQ_NO_I2C3_EV       72U
+#define IRQ_NO_I2C3_ER       73U
+#define IRQ_NO_I2C4_EV       95U
+#define IRQ_NO_I2C4_ER       96U
+/*
  * NVIC register addresses
  */
 #define NVIC_ISER_BASEADDR    ((volatile uint32_t*)0xE000E100U)
@@ -555,6 +576,7 @@ typedef struct
 #define USART_CR1_UE        0
 #define USART_CR1_RE        2
 #define USART_CR1_TE        3
+#define USART_CR1_IDLEIE    4
 #define USART_CR1_RXNEIE    5
 #define USART_CR1_TCIE      6
 #define USART_CR1_TXEIE     7
@@ -592,6 +614,8 @@ typedef struct
 #define USART_ICR_FECF      1
 #define USART_ICR_NCF       2
 #define USART_ICR_ORECF     3
+#define USART_ICR_IDLECF    4
+#define USART_ICR_TCCF      6
 
 /*
  * USART flags
@@ -605,6 +629,7 @@ typedef struct
 #define USART_FLAG_TXE      (1U << USART_ISR_TXE)
 #define USART_FLAG_TEACK    (1U << USART_ISR_TEACK)
 #define USART_FLAG_REACK    (1U << USART_ISR_REACK)
+#define USART_FLAG_IDLE     (1U << USART_ISR_IDLE)
 
 /*
  * Clock source values

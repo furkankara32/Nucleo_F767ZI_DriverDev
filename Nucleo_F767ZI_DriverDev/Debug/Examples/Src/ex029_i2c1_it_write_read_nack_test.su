@@ -1,0 +1,4 @@
+../Examples/Src/ex029_i2c1_it_write_read_nack_test.c:66:13:I2C1_GPIOInits	24	static
+../Examples/Src/ex029_i2c1_it_write_read_nack_test.c:91:13:I2C1_Inits	8	static
+../Examples/Src/ex029_i2c1_it_write_read_nack_test.c:103:6:EX029_I2C1_IT_WriteRead_NACK_Test	40	static
+../Examples/Src/ex029_i2c1_it_write_read_nack_test.c:218:6:I2C_ApplicationEventCallback	16	static

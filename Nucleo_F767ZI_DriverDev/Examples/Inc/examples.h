@@ -26,4 +26,15 @@ void EX015_I2C1_Init_Test(void);
 void EX016_I2C1_MasterSend_NACK_Test(void);
 void EX017_I2C1_Scanner_Test(void);
 void EX018_I2C1_SSD1306_Command_Test(void);
+void EX019_USART3_InterruptTx_Test(void);
+void EX020_USART3_IdleRx_Test(void);
+void EX021_SPI1_Loopback_IT_Test(void);
+void EX022_SPI1_Send_IT_Test(void);
+void EX023_SPI1_Receive_IT_Test(void);
+void EX024_I2C1_IT_NACK_Test(void);
+void EX025_I2C1_IT_RxNACK_Test(void);
+void EX026_I2C1_IT_Tx_To_I2C2_Slave_Test(void);
+void EX027_I2C1_IT_Rx_From_I2C2_Slave_Test(void);
+void EX028_I2C1_IT_WriteRead_I2C2_Slave_Test(void);
+void EX029_I2C1_IT_WriteRead_NACK_Test(void);
 #endif /* INC_EXAMPLES_H_ */

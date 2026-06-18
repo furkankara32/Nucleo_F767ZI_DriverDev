@@ -8,6 +8,8 @@
 #include "stm32f767xx_gpio_driver.h"
 #include "stm32f767xx_systick_driver.h"
 #include "stm32f767xx_usart_driver.h"
+#include "stm32f767xx_spi_driver.h"
+#include "stm32f767xx_i2c_driver.h"
 void EXTI0_IRQHandler(void)
 {
 	GPIO_IRQHandling(GPIO_PIN_NO_0);
@@ -84,4 +86,72 @@ void UART7_IRQHandler(void)
 void UART8_IRQHandler(void)
 {
 	USART_IRQHandling(UART8);
+}
+void SPI1_IRQHandler(void)
+{
+	SPI_IRQHandling(SPI1);
+}
+
+void SPI2_IRQHandler(void)
+{
+	SPI_IRQHandling(SPI2);
+}
+
+void SPI3_IRQHandler(void)
+{
+	SPI_IRQHandling(SPI3);
+}
+
+void SPI4_IRQHandler(void)
+{
+	SPI_IRQHandling(SPI4);
+}
+
+void SPI5_IRQHandler(void)
+{
+	SPI_IRQHandling(SPI5);
+}
+
+void SPI6_IRQHandler(void)
+{
+	SPI_IRQHandling(SPI6);
+}
+void I2C1_EV_IRQHandler(void)
+{
+    I2C_EV_IRQHandling(I2C1);
+}
+
+void I2C1_ER_IRQHandler(void)
+{
+    I2C_ER_IRQHandling(I2C1);
+}
+
+void I2C2_EV_IRQHandler(void)
+{
+    I2C_EV_IRQHandling(I2C2);
+}
+
+void I2C2_ER_IRQHandler(void)
+{
+    I2C_ER_IRQHandling(I2C2);
+}
+
+void I2C3_EV_IRQHandler(void)
+{
+    I2C_EV_IRQHandling(I2C3);
+}
+
+void I2C3_ER_IRQHandler(void)
+{
+    I2C_ER_IRQHandling(I2C3);
+}
+
+void I2C4_EV_IRQHandler(void)
+{
+    I2C_EV_IRQHandling(I2C4);
+}
+
+void I2C4_ER_IRQHandler(void)
+{
+    I2C_ER_IRQHandling(I2C4);
 }

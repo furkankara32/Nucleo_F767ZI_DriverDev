@@ -464,6 +464,14 @@ uint8_t  USART_Init(USART_Handle_t *pUSARTHandle)
 		}
 	}
 
+
+	/*
+	 * Initialize non-blocking TX state
+	 */
+	pUSARTHandle->pTxBuffer = 0;
+	pUSARTHandle->TxLen = 0U;
+	pUSARTHandle->TxBusyState = USART_READY;
+
 	/*
 	 * 13. Register handle for IRQ handling
 	 */
@@ -540,6 +548,10 @@ void USART_PeripheralInterruptControl(USART_RegDef_t *pUSARTx,
 		{
 			pUSARTx->USART_CR1 |= (1U << USART_CR1_PEIE);
 		}
+		else if(InterruptName == USART_INTERRUPT_IDLE)
+		{
+			pUSARTx->USART_CR1 |= (1U <<USART_CR1_IDLEIE);
+		}
 		else if (InterruptName == USART_INTERRUPT_ERR)
 		{
 			pUSARTx->USART_CR3 |= (1U << USART_CR3_EIE);
@@ -562,6 +574,10 @@ void USART_PeripheralInterruptControl(USART_RegDef_t *pUSARTx,
 		else if (InterruptName == USART_INTERRUPT_PE)
 		{
 			pUSARTx->USART_CR1 &= ~(1U << USART_CR1_PEIE);
+		}
+		else if(InterruptName == USART_CR1_IDLEIE)
+		{
+			pUSARTx->USART_CR1 &= ~(1u << USART_CR1_IDLEIE);
 		}
 		else if (InterruptName == USART_INTERRUPT_ERR)
 		{
@@ -646,6 +662,43 @@ uint8_t USART_ReceiveDataWithTimeout(USART_Handle_t *pUSARTHandle, uint8_t *pRxB
 
 	return USART_STATUS_OK;
 }
+
+uint8_t USART_SendDataIT(USART_Handle_t *pUSARTHandle, uint8_t *pTxBuffer,uint32_t Len)
+{
+	if ((pUSARTHandle == 0) || (pTxBuffer == 0) || (Len == 0U))
+	{
+		return USART_STATUS_ERROR;
+	}
+
+	if ((pUSARTHandle->USART_Config.USART_WordLength == USART_WORDLEN_9BITS) && (pUSARTHandle->USART_Config.USART_ParityControl == USART_PARITY_DISABLE))
+	{
+		return USART_STATUS_ERROR;
+	}
+
+	if (pUSARTHandle->TxBusyState != USART_READY)
+	{
+		return USART_STATUS_BUSY;
+	}
+
+	pUSARTHandle->pTxBuffer = pTxBuffer;
+	pUSARTHandle->TxLen = Len;
+	pUSARTHandle->TxBusyState = USART_BUSY_IN_TX;
+
+	/*
+	 * Clear TC flag
+	 */
+	pUSARTHandle->pUSARTx->USART_ICR = (1U << USART_ICR_TCCF);
+
+	/*
+	 * Enable TXE interrupt
+	 */
+	pUSARTHandle->pUSARTx->USART_CR1 |= (1U << USART_CR1_TXEIE);
+
+	return USART_STATUS_OK;
+
+
+
+}
 uint8_t USART_RxRingBufferInit(USART_Handle_t *pUSARTHandle,
 							   uint8_t *pBuffer,
 							   uint16_t Size)
@@ -663,7 +716,20 @@ uint8_t USART_RxRingBufferInit(USART_Handle_t *pUSARTHandle,
 
 	return USART_STATUS_OK;
 }
+void USART_CloseTransmission(USART_Handle_t *pUSARTHandle)
+{
+	if(pUSARTHandle == 0)
+	{
+		return;
+	}
 
+	pUSARTHandle->pUSARTx->USART_CR1 &= ~(1U << USART_CR1_TXEIE);
+	pUSARTHandle->pUSARTx->USART_CR1 &= ~(1U << USART_CR1_TCIE);
+
+	pUSARTHandle->pTxBuffer = 0;
+	pUSARTHandle->TxLen = 0;
+	pUSARTHandle->TxBusyState = USART_READY;
+}
 uint16_t USART_RxAvailable(USART_Handle_t *pUSARTHandle)
 {
 	uint16_t head = pUSARTHandle->RxHead;
@@ -823,12 +889,63 @@ void USART_IRQHandling(USART_RegDef_t *pUSARTx)
 
 		USART_RxRingBufferPush(pUSARTHandle, rx_data);
 
-		USART_ApplicationEventCallback(pUSARTHandle,
-									   USART_EVENT_RX_BYTE_RECEIVED);
+		USART_ApplicationEventCallback(pUSARTHandle,USART_EVENT_RX_BYTE_RECEIVED);
+
 	}
-}
-__attribute__((weak)) void USART_ApplicationEventCallback(USART_Handle_t *pUSARTHandle,
-														 uint8_t Event)
+
+	/*
+	 * Idle interrupt
+	 * Idle = 1 means RX line has been Idle after receiving data.
+	 * It useful for variable length packet detection.
+	 */
+	if((isr & USART_FLAG_IDLE) && (cr1 & (1U << USART_CR1_IDLEIE)))
+	{
+		pUSARTx->USART_ICR = (1U << USART_ICR_IDLECF);
+
+		USART_ApplicationEventCallback(pUSARTHandle, USART_EVENT_IDLE);
+	}
+
+	/*
+	 * TXE interrupt event
+	 */
+	if((isr & USART_FLAG_TXE) && (cr1 & (1U << USART_CR1_TXEIE)))
+	{
+		if((pUSARTHandle->TxBusyState == USART_BUSY_IN_TX) && (pUSARTHandle->TxLen > 0U))
+		{
+			data_mask = USART_GetDataMask(pUSARTHandle);
+
+			pUSARTx->USART_TDR = ((uint16_t)(*(pUSARTHandle->pTxBuffer)) & data_mask);
+			pUSARTHandle->pTxBuffer++;
+			pUSARTHandle->TxLen--;
+
+			if(pUSARTHandle->TxLen == 0U)
+			{
+				//Disable TXE and wait for TC
+				pUSARTx->USART_CR1 &= ~(1U << USART_CR1_TXEIE);
+				pUSARTx->USART_CR1 |= (1U << USART_CR1_TCIE);
+			}
+		}
+		else
+		{
+			pUSARTx->USART_CR1 &= ~(1U << USART_CR1_TXEIE);
+		}
+	}
+
+	/*
+	 * TCE interrupt event
+	 */
+	 if((isr & USART_FLAG_TC) && (cr1 & (1U << USART_CR1_TCIE)))
+	 {
+		 pUSARTx->USART_ICR = (1U << USART_ICR_TCCF);
+
+		 USART_CloseTransmission(pUSARTHandle);
+
+		 USART_ApplicationEventCallback(pUSARTHandle, USART_EVENT_TX_CMPLT);
+	 }
+
+	}
+
+__attribute__((weak)) void USART_ApplicationEventCallback(USART_Handle_t *pUSARTHandle,uint8_t Event)
 {
 	(void)pUSARTHandle;
 	(void)Event;

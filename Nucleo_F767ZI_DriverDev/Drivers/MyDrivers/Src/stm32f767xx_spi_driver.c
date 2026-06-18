@@ -8,6 +8,70 @@
 #include "stm32f767xx_spi_driver.h"
 #include "stm32f767xx_systick_driver.h"
 
+static SPI_Handle_t *s_SPI1Handle = 0;
+static SPI_Handle_t *s_SPI2Handle = 0;
+static SPI_Handle_t *s_SPI3Handle = 0;
+static SPI_Handle_t *s_SPI4Handle = 0;
+static SPI_Handle_t *s_SPI5Handle = 0;
+static SPI_Handle_t *s_SPI6Handle = 0;
+
+static void SPI_RegisterHandle(SPI_Handle_t *pSPIHandle)
+{
+	if (pSPIHandle->pSPIx == SPI1)
+	{
+		s_SPI1Handle = pSPIHandle;
+	}
+	else if (pSPIHandle->pSPIx == SPI2)
+	{
+		s_SPI2Handle = pSPIHandle;
+	}
+	else if (pSPIHandle->pSPIx == SPI3)
+	{
+		s_SPI3Handle = pSPIHandle;
+	}
+	else if (pSPIHandle->pSPIx == SPI4)
+	{
+		s_SPI4Handle = pSPIHandle;
+	}
+	else if (pSPIHandle->pSPIx == SPI5)
+	{
+		s_SPI5Handle = pSPIHandle;
+	}
+	else if (pSPIHandle->pSPIx == SPI6)
+	{
+		s_SPI6Handle = pSPIHandle;
+	}
+}
+
+static SPI_Handle_t *SPI_GetHandleFromInstance(SPI_RegDef_t *pSPIx)
+{
+	if (pSPIx == SPI1)
+	{
+		return s_SPI1Handle;
+	}
+	else if (pSPIx == SPI2)
+	{
+		return s_SPI2Handle;
+	}
+	else if (pSPIx == SPI3)
+	{
+		return s_SPI3Handle;
+	}
+	else if (pSPIx == SPI4)
+	{
+		return s_SPI4Handle;
+	}
+	else if (pSPIx == SPI5)
+	{
+		return s_SPI5Handle;
+	}
+	else if (pSPIx == SPI6)
+	{
+		return s_SPI6Handle;
+	}
+
+	return 0;
+}
 static uint8_t SPI_WaitOnFlagUntilTimeout(SPI_RegDef_t *pSPIx, uint32_t Flagname, uint8_t DesiredStatus, uint32_t TimeoutMs)
 {
 	uint32_t start_tick = millis();
@@ -196,6 +260,20 @@ uint8_t SPI_Init(SPI_Handle_t *pSPIHandle)
 		return SPI_STATUS_ERROR;
 	}
 
+	/*
+	 * Initialize non-blocking transfer state.
+	 */
+	pSPIHandle->pTxBuffer = 0;
+	pSPIHandle->pRxBuffer = 0;
+	pSPIHandle->TxLen = 0U;
+	pSPIHandle->RxLen = 0U;
+	pSPIHandle->TxState = SPI_READY;
+	pSPIHandle->RxState = SPI_READY;
+	pSPIHandle->TransferMode = SPI_TRANSFER_MODE_NONE;
+
+	SPI_RegisterHandle(pSPIHandle);
+
+
 	return SPI_STATUS_OK;
 }
 
@@ -247,6 +325,7 @@ uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName)
 
 	return RESET;
 }
+
 static void SPI_WriteData8(SPI_RegDef_t *pSPIx, uint8_t data)
 {
 	/*
@@ -257,6 +336,43 @@ static void SPI_WriteData8(SPI_RegDef_t *pSPIx, uint8_t data)
 static uint8_t SPI_ReadData8(SPI_RegDef_t *pSPIx)
 {
 	return *((volatile uint8_t *)&pSPIx->SPI_DR);
+}
+static void SPI_EndITTransfer(SPI_Handle_t *pSPIHandle,uint8_t Event)
+{
+	SPI_RegDef_t *pSPIx = pSPIHandle->pSPIx;
+
+	pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_TXEIE);
+	pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_RXNEIE);
+	pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_ERRIE);
+
+	pSPIHandle->pTxBuffer = 0;
+	pSPIHandle->pRxBuffer = 0;
+	pSPIHandle->TxLen = 0U;
+	pSPIHandle->RxLen = 0U;
+	pSPIHandle->TxState = SPI_READY;
+	pSPIHandle->RxState = SPI_READY;
+	pSPIHandle->TransferMode = SPI_TRANSFER_MODE_NONE;
+
+	SPI_ApplicationEventCallback(pSPIHandle, Event);
+}
+
+static void SPI_TryEndITTransfer(SPI_Handle_t *pSPIHandle)
+{
+	if ((pSPIHandle->TxLen == 0U) && (pSPIHandle->RxLen == 0U))
+	{
+		if (pSPIHandle->TransferMode == SPI_TRANSFER_MODE_TX_ONLY)
+		{
+			SPI_EndITTransfer(pSPIHandle, SPI_EVENT_TX_CMPLT);
+		}
+		else if (pSPIHandle->TransferMode == SPI_TRANSFER_MODE_RX_ONLY)
+		{
+			SPI_EndITTransfer(pSPIHandle, SPI_EVENT_RX_CMPLT);
+		}
+		else if (pSPIHandle->TransferMode == SPI_TRANSFER_MODE_TX_RX)
+		{
+			SPI_EndITTransfer(pSPIHandle, SPI_EVENT_TX_RX_CMPLT);
+		}
+	}
 }
 static uint8_t SPI_WaitUntilNotBusy(SPI_RegDef_t *pSPIx, uint32_t TimeoutMs)
 {
@@ -269,6 +385,133 @@ static uint8_t SPI_WaitUntilNotBusy(SPI_RegDef_t *pSPIx, uint32_t TimeoutMs)
 		return SPI_STATUS_BUSY_TIMEOUT;
 	}
 	return SPI_STATUS_OK;
+}
+void SPI_IRQHandling(SPI_RegDef_t *pSPIx)
+{
+	SPI_Handle_t *pSPIHandle;
+	uint32_t sr;
+	uint32_t cr2;
+	uint8_t dummy_read;
+
+	pSPIHandle = SPI_GetHandleFromInstance(pSPIx);
+
+	if (pSPIHandle == 0)
+	{
+		return;
+	}
+
+	sr = pSPIx->SPI_SR;
+	cr2 = pSPIx->SPI_CR2;
+
+	/*
+	 * OVR error
+	 */
+	if ((sr & SPI_FLAG_OVR) && (cr2 & (1U << SPI_CR2_ERRIE)))
+	{
+		SPI_ClearOVRFlag(pSPIx);
+
+		SPI_EndITTransfer(pSPIHandle, SPI_EVENT_OVR_ERR);
+		return;
+	}
+
+	/*
+	 * MODF error
+	 */
+	if ((sr & SPI_FLAG_MODF) && (cr2 & (1U << SPI_CR2_ERRIE)))
+	{
+		SPI_ClearMODFFlag(pSPIx);
+
+		SPI_EndITTransfer(pSPIHandle, SPI_EVENT_MODF_ERR);
+		return;
+	}
+
+	/*
+	 * CRC error
+	 */
+	if ((sr & SPI_FLAG_CRCERR) && (cr2 & (1U << SPI_CR2_ERRIE)))
+	{
+		SPI_ClearCRCERRFlag(pSPIx);
+
+		SPI_EndITTransfer(pSPIHandle, SPI_EVENT_CRC_ERR);
+		return;
+	}
+
+	/*
+	 * Frame format error
+	 */
+	if ((sr & SPI_FLAG_FRE) && (cr2 & (1U << SPI_CR2_ERRIE)))
+	{
+		SPI_ClearFREFlag(pSPIx);
+
+		SPI_EndITTransfer(pSPIHandle, SPI_EVENT_FRE_ERR);
+		return;
+	}
+
+	/*
+	 * TXE interrupt
+	 */
+	if ((sr & SPI_FLAG_TXE) && (cr2 & (1U << SPI_CR2_TXEIE)))
+	{
+		if (pSPIHandle->TxLen > 0U)
+		{
+			if (pSPIHandle->TransferMode == SPI_TRANSFER_MODE_RX_ONLY)
+			{
+				SPI_WriteData8(pSPIx, 0xFFU);
+			}
+			else
+			{
+				SPI_WriteData8(pSPIx, *(pSPIHandle->pTxBuffer));
+				pSPIHandle->pTxBuffer++;
+			}
+
+			pSPIHandle->TxLen--;
+
+			if (pSPIHandle->TxLen == 0U)
+			{
+				pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_TXEIE);
+			}
+		}
+		else
+		{
+			pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_TXEIE);
+		}
+	}
+
+	/*
+	 * RXNE interrupt
+	 */
+	if ((sr & SPI_FLAG_RXNE) && (cr2 & (1U << SPI_CR2_RXNEIE)))
+	{
+		if (pSPIHandle->RxLen > 0U)
+		{
+			if (pSPIHandle->TransferMode == SPI_TRANSFER_MODE_TX_ONLY)
+			{
+				dummy_read = SPI_ReadData8(pSPIx);
+				(void)dummy_read;
+			}
+			else
+			{
+				*(pSPIHandle->pRxBuffer) = SPI_ReadData8(pSPIx);
+				pSPIHandle->pRxBuffer++;
+			}
+
+			pSPIHandle->RxLen--;
+
+			if (pSPIHandle->RxLen == 0U)
+			{
+				pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_RXNEIE);
+			}
+		}
+		else
+		{
+			dummy_read = SPI_ReadData8(pSPIx);
+			(void)dummy_read;
+
+			pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_RXNEIE);
+		}
+	}
+
+	SPI_TryEndITTransfer(pSPIHandle);
 }
 uint8_t SPI_GetErrorStatus(SPI_RegDef_t *pSPIx)
 {
@@ -538,4 +781,168 @@ uint8_t SPI_TransmitReceiveWithTimeout(SPI_Handle_t *pSPIHandle,uint8_t *pTxBuff
 	}
 
 	return SPI_STATUS_OK;
+}
+uint8_t SPI_SendDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer,uint32_t Len)
+{
+	if ((pSPIHandle == 0) || (pTxBuffer == 0) || (Len == 0U))
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	if (pSPIHandle->SPI_Config.SPI_DataSize != SPI_DATA_SIZE_8BIT)
+	{
+		return SPI_STATUS_UNSUPPORTED;
+	}
+
+	if (pSPIHandle->TxState != SPI_READY)
+	{
+		return SPI_STATUS_BUSY;
+	}
+
+	if (pSPIHandle->SPI_Config.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_RXONLY)
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	/*
+	 * Half-duplex TX mode.
+	 */
+	if (pSPIHandle->SPI_Config.SPI_BusConfig == SPI_BUS_CONFIG_HALF_DUPLEX)
+	{
+		pSPIHandle->pSPIx->SPI_CR1 |= (1U << SPI_CR1_BIDIOE);
+		pSPIHandle->RxLen = 0U;
+		pSPIHandle->RxState = SPI_READY;
+	}
+	else
+	{
+		/*
+		 * Full-duplex TX only:
+		 * every transmitted byte also produces a received dummy byte.
+		 * RXNE interrupt reads those dummy bytes to avoid OVR.
+		 */
+		pSPIHandle->RxLen = Len;
+		pSPIHandle->RxState = SPI_BUSY_IN_RX;
+		pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_RXNEIE);
+	}
+
+	pSPIHandle->pTxBuffer = pTxBuffer;
+	pSPIHandle->pRxBuffer = 0;
+	pSPIHandle->TxLen = Len;
+	pSPIHandle->TxState = SPI_BUSY_IN_TX;
+	pSPIHandle->TransferMode = SPI_TRANSFER_MODE_TX_ONLY;
+
+	pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_ERRIE);
+	pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_TXEIE);
+
+	return SPI_STATUS_OK;
+}
+uint8_t SPI_ReceiveDataIT(SPI_Handle_t *pSPIHandle, uint8_t *pRxBuffer,uint32_t Len)
+{
+	if ((pSPIHandle == 0) || (pRxBuffer == 0) || (Len == 0U))
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	if (pSPIHandle->SPI_Config.SPI_DataSize != SPI_DATA_SIZE_8BIT)
+	{
+		return SPI_STATUS_UNSUPPORTED;
+	}
+
+	if ((pSPIHandle->RxState != SPI_READY) ||
+		(pSPIHandle->TxState != SPI_READY))
+	{
+		return SPI_STATUS_BUSY;
+	}
+
+	/*
+	 * First version supports full-duplex master receive.
+	 * Master must transmit dummy bytes to generate clock.
+	 */
+	if (pSPIHandle->SPI_Config.SPI_BusConfig != SPI_BUS_CONFIG_FULL_DUPLEX)
+	{
+		return SPI_STATUS_UNSUPPORTED;
+	}
+
+	pSPIHandle->pTxBuffer = 0;
+	pSPIHandle->pRxBuffer = pRxBuffer;
+	pSPIHandle->TxLen = Len;
+	pSPIHandle->RxLen = Len;
+	pSPIHandle->TxState = SPI_BUSY_IN_TX;
+	pSPIHandle->RxState = SPI_BUSY_IN_RX;
+	pSPIHandle->TransferMode = SPI_TRANSFER_MODE_RX_ONLY;
+
+	pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_ERRIE);
+	pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_RXNEIE);
+	pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_TXEIE);
+
+	return SPI_STATUS_OK;
+}
+uint8_t SPI_TransmitReceiveIT(SPI_Handle_t *pSPIHandle, uint8_t *pTxBuffer,uint8_t *pRxBuffer, uint32_t Len)
+{
+	if ((pSPIHandle == 0) || (pTxBuffer == 0) || (pRxBuffer == 0) || (Len == 0U))
+	{
+		return SPI_STATUS_ERROR;
+	}
+
+	if (pSPIHandle->SPI_Config.SPI_DataSize != SPI_DATA_SIZE_8BIT)
+	{
+		return SPI_STATUS_UNSUPPORTED;
+	}
+
+	if ((pSPIHandle->RxState != SPI_READY) ||
+		(pSPIHandle->TxState != SPI_READY))
+	{
+		return SPI_STATUS_BUSY;
+	}
+
+	if (pSPIHandle->SPI_Config.SPI_BusConfig != SPI_BUS_CONFIG_FULL_DUPLEX)
+	{
+		return SPI_STATUS_UNSUPPORTED;
+	}
+
+	pSPIHandle->pTxBuffer = pTxBuffer;
+	pSPIHandle->pRxBuffer = pRxBuffer;
+	pSPIHandle->TxLen = Len;
+	pSPIHandle->RxLen = Len;
+	pSPIHandle->TxState = SPI_BUSY_IN_TX;
+	pSPIHandle->RxState = SPI_BUSY_IN_RX;
+	pSPIHandle->TransferMode = SPI_TRANSFER_MODE_TX_RX;
+
+	pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_ERRIE);
+	pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_RXNEIE);
+	pSPIHandle->pSPIx->SPI_CR2 |= (1U << SPI_CR2_TXEIE);
+
+	return SPI_STATUS_OK;
+}
+void SPI_CloseTransmission(SPI_Handle_t *pSPIHandle)
+{
+	if (pSPIHandle == 0)
+	{
+		return;
+	}
+
+	pSPIHandle->pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_TXEIE);
+
+	pSPIHandle->pTxBuffer = 0;
+	pSPIHandle->TxLen = 0U;
+	pSPIHandle->TxState = SPI_READY;
+}
+
+void SPI_CloseReception(SPI_Handle_t *pSPIHandle)
+{
+	if (pSPIHandle == 0)
+	{
+		return;
+	}
+
+	pSPIHandle->pSPIx->SPI_CR2 &= ~(1U << SPI_CR2_RXNEIE);
+
+	pSPIHandle->pRxBuffer = 0;
+	pSPIHandle->RxLen = 0U;
+	pSPIHandle->RxState = SPI_READY;
+}
+__attribute__((weak)) void SPI_ApplicationEventCallback(SPI_Handle_t *pSPIHandle,uint8_t Event)
+{
+	(void)pSPIHandle;
+	(void)Event;
 }
