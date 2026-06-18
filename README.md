@@ -4,13 +4,13 @@
 
 # This repository contains a bare-metal peripheral driver development project for the \*\*STM32F767ZI\*\* microcontroller on the \*\*NUCLEO-F767ZI\*\* development board.
 
+
+
+The main purpose of this project is to develop low-level peripheral drivers without relying on high-level HAL driver APIs, in order to better understand register-level embedded software development and build a reusable driver layer for future embedded projects.
+
 # 
 
-# The main purpose of this project is to develop low-level peripheral drivers without relying on high-level HAL driver APIs, in order to better understand register-level embedded software development and build a reusable driver layer for future embedded projects.
-
-# 
-
-# \## Target Board
+# ## Target Board
 
 # 
 
